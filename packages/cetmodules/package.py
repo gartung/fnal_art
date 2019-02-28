@@ -32,7 +32,11 @@ class Cetmodules(CMakePackage):
 
     homepage = 'https://cdcvs.fnal.gov/projects/cetmodules'
 
-    version('develop', branch='master', git=homepage, preferred=True)
+    version('master', branch='master', git=homepage)
+    version('develop', branch='develop', git=homepage)
+    version('0.08.00',
+            sha256='fd2f295c1f91ae41c1f8ae6f014c0fe6c7de8432f8a9020b3bcb9778e1b9f607',
+            extension='tbz2')
     version('0.07.00', '60fb6f9ff26605ea4c0648fa43d0a516', extension='tbz2')
 
     depends_on('cmake@3.4:', type='build')
