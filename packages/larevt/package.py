@@ -27,7 +27,7 @@ class Larevt(CMakePackage):
     list_url = "https://api.github.com/repos/LArSoft/larevt/tags"
 
     version('09.30.00.rc1', sha256='0bb9897c953a9bb69e2c1bd5be4c8c7586d577b0fb572e6cc1cdc5c0e337637f')
-    version('09.03.05.vecmt01', tag='mtsp-v09_37_02_04', git='https://github.com/cerati/larevt.git', get_full_repo=True )
+    version('09.03.05vecmt.01', tag='mtsp-v09_37_02_04', git='https://github.com/cerati/larevt.git', get_full_repo=True )
     version('09.03.05',     sha256='fc3084ff2441a8358c549a0f23fae39c7b37f977ef29c0c573b2a8aeb9a07cf8')
     version('09.03.03',     sha256='7ce85f65911034c354517800dd041e7a00afe7b1838168911fea5809199f5dc1')
     version('09.03.02',     sha256='9c6980a93b3f2ca0bc432d885ee8eb7cd2c8c7c1a47e1e503c8fdf7891493a3c')
@@ -56,7 +56,7 @@ class Larevt(CMakePackage):
 
     patch('v09_03_03.patch', when='@09.03.03')
     patch('v09_03_05.patch', when='@09.03.05')
-    patch('v09_03_05_vecmt01.patch', when='@09.03.05.vecmt01')
+    patch('v09_03_05_vecmt01.patch', when='@09.03.05vecmt.01')
 
     variant('cxxstd',
             default='17',
