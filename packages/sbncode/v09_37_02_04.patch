@@ -1,0 +1,3137 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index bd97806..49c599a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-# ======================================================================
++#======================================================================
+ #  larsoft main build file
+ #
+ #  cd .../path/to/build/directory
+@@ -11,19 +11,15 @@
+ #  make install
+ #  make package (builds distribution tarfile)
+ # ======================================================================
+-
+-
+ cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
+ 
+ 
++
++find_package(cetmodules 2.29.07 REQUIRED)
+ project(sbncode VERSION 09.37.02.04 LANGUAGES CXX)
+ 
+ message(STATUS "\n\n  ==========================   ${PROJECT_NAME}   ==========================")
+ 
+-# cetbuildtools contains our cmake modules
+-find_package(cetbuildtools REQUIRED)
+-
+-list(APPEND CMAKE_MODULE_PATH $ENV{CANVAS_ROOT_IO_DIR}/Modules $ENV{ART_DIR}/Modules )
+ 
+ include(CetCMakeEnv)
+ cet_cmake_env()
+@@ -39,98 +35,102 @@ cet_set_compiler_flags(DIAGS CAUTIOUS
+   ALLOW_DEPRECATIONS
+   EXTRA_FLAGS -pedantic -Wno-unused-local-typedefs -Wno-undefined-var-template
+ )
+-
+-cet_report_compiler_flags()
++set(fcl_dir caf)
++cet_report_compiler_flags(REPORT_THRESHOLD VERBOSE)
+ 
+ # these are minimum required versions, not the actual product versions
+-find_ups_product(art)
+-find_ups_product(messagefacility)
+-find_ups_product(art_root_io)
+-find_ups_product(gsl)
+-find_ups_product(nusimdata)
+-find_ups_product(nug4)
+-find_ups_product(nugen)
+-find_ups_product(nurandom)
+-find_ups_product(nutools)
+-find_ups_product(genie)
+-find_ups_product(lardataobj)
+-find_ups_product(larcoreobj)
+-find_ups_product(larcorealg)
+-find_ups_product(lardataalg)
+-find_ups_product(larcore)
+-find_ups_product(lardata)
+-find_ups_product(larevt)
+-find_ups_product(larsim)
+-find_ups_product(larreco)
+-find_ups_product(larpandora)
+-find_ups_product(larsoft v09_00_00)
+-find_ups_product(artdaq_core v3_06_01)
+-find_ups_product(ifbeam)
+-find_ups_product(ifbeam_art)
+-find_ups_product(libwda) 
+-find_ups_product(sbnobj v09_10_00)
+-find_ups_product(sbndata v01_03)
+-find_ups_product(ifdhc)
+-find_ups_product(ifdh_art)
+-find_ups_product(log4cpp)
+-find_ups_boost()
+-find_ups_root()
+-#find_ups_product(sbndcode v06_67_00)
+-#find_ups_product(uboonecode v06_67_00)
+-find_ups_product( sbndaq_artdaq_core )
++find_package(art) 
++find_package(messagefacility) 
++find_package(art_root_io) 
++find_package(nusimdata) 
++find_package(nug4) 
++find_package(nugen) 
++find_package(nurandom) 
++find_package(nutools) 
++find_package(GENIE) 
++find_package(lardataobj) 
++find_package(larcoreobj) 
++find_package(larcorealg) 
++find_package(lardataalg) 
++find_package(larcore) 
++find_package(lardata) 
++find_package(larevt) 
++find_package(larsim) 
++find_package(larreco) 
++find_package(larpandora) 
++find_package(larpandoracontent) 
++find_package(artdaq_core ) 
++find_package(sbnobj ) 
++find_package(sbnanaobj )
++find_package(sbndaq_artdaq_core )
++find_package(sbndata) 
++find_package(ifdhc) 
++find_package(ifdh_art) 
++find_package(ifbeam)
++find_package(ifbeam_art)
++find_package( trace )
++find_package( libwda )
++
++find_package(CLHEP COMPONENTS ALL)
++find_package(ROOT REQUIRED)
++find_package(Geant4 REQUIRED)
++find_package(Boost COMPONENTS system)
++find_library( GSL NAMES gsl )
++find_library( LOG4CPP NAMES log4cpp )
++find_library( XML2 NAMES xml2 )
+ 
+ 
+ # GENIE libraries are needed, added Aug2021 by Keng 
+ # genie (copied from nugen)
+   cet_find_library( LOG4CPP      NAMES log4cpp      PATHS ENV LOG4CPP_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GFWMSG       NAMES GFwMsg       PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GFWREG       NAMES GFwReg       PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GFWALG       NAMES GFwAlg       PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GFWINT       NAMES GFwInt       PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GFWGHEP      NAMES GFwGHEP      PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GFWNUM       NAMES GFwNum       PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GFWUTL       NAMES GFwUtl       PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GFWPARDAT    NAMES GFwParDat    PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GFWEG        NAMES GFwEG        PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GFWNTP       NAMES GFwNtp       PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHXSIG      NAMES GPhXSIg      PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHPDF       NAMES GPhPDF       PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHNUCLST    NAMES GPhNuclSt    PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHCMN       NAMES GPhCmn       PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHDCY       NAMES GPhDcy       PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHHADTRANSP NAMES GPhHadTransp PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHHADNZ     NAMES GPhHadnz     PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHDEEX      NAMES GPhDeEx      PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHAMNGXS    NAMES GPhAMNGXS    PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHAMNGEG    NAMES GPhAMNGEG    PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHCHMXS     NAMES GPhChmXS     PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHCOHXS     NAMES GPhCohXS     PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHCOHEG     NAMES GPhCohEG     PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHDISXS     NAMES GPhDISXS     PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHDISEG     NAMES GPhDISEG     PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHDFRCXS    NAMES GPhDfrcXS    PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHDFRCEG    NAMES GPhDfrcEG    PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHGLWRESXS  NAMES GPhGlwResXS  PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHGLWRESEG  NAMES GPhGlwResEG  PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHIBDXS     NAMES GPhIBDXS     PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHIBDEG     NAMES GPhIBDEG     PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHMNUCXS    NAMES GPhMNucXS    PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHMNUCEG    NAMES GPhMNucEG    PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHMEL       NAMES GPhMEL       PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHNUELXS    NAMES GPhNuElXS    PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHNUELEG    NAMES GPhNuElEG    PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHQELXS     NAMES GPhQELXS     PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHQELEG     NAMES GPhQELEG     PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHRESXS     NAMES GPhResXS     PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHRESEG     NAMES GPhResEG     PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHSTRXS     NAMES GPhStrXS     PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHSTREG     NAMES GPhStrEG     PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GPHNDCY      NAMES GPhNDcy      PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GTLGEO       NAMES GTlGeo       PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GTLFLX       NAMES GTlFlx       PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GRWFWK       NAMES GRwFwk       PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GRWIO        NAMES GRwIO        PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
+-  cet_find_library( GRWCLC       NAMES GRwClc       PATHS ENV GENIE_LIB NO_DEFAULT_PATH )
++  set( GFWMSG       ${GFwMsg_LIBRARY}        )
++  set( GFWREG       ${GFwReg_LIBRARY}       )
++  set( GFWALG       ${GFwAlg_LIBRARY}       )
++  set( GFWINT       ${GFwInt_LIBRARY}        )
++  set( GFWGHEP      ${GFwGHEP_LIBRARY}       )
++  set( GFWNUM       ${GFwNum_LIBRARY}        )
++  set( GFWUTL       ${GFwUtl_LIBRARY}        )
++  set( GFWPARDAT    ${GFwParDat_LIBRARY}     )
++  set( GFWEG        ${GFwEG_LIBRARY}         )
++  set( GFWNTP       ${GFwNtp_LIBRARY}        )
++  set( GPHXSIG      ${GPhXSIg_LIBRARY}       )
++  set( GPHPDF       ${GPhPDF_LIBRARY}        )
++  set( GPHNUCLST    ${GPhNuclSt_LIBRARY}     )
++  set( GPHCMN       ${GPhCmn_LIBRARY}        )
++  set( GPHDCY       ${GPhDcy_LIBRARY}        )
++  set( GPHHADTRANSP ${GPhHadTransp_LIBRARY}  )
++  set( GPHHADNZ     ${GPhHadnz_LIBRARY}      )
++  set( GPHDEEX      ${GPhDeEx_LIBRARY}       )
++  set( GPHAMNGXS    ${GPhAMNGXS_LIBRARY}     )
++  set( GPHAMNGEG    ${GPhAMNGEG_LIBRARY}     )
++  set( GPHCHMXS     ${GPhChmXS_LIBRARY}      )
++  set( GPHCOHXS     ${GPhCohXS_LIBRARY}      )
++  set( GPHCOHEG     ${GPhCohEG_LIBRARY}      )
++  set( GPHDISXS     ${GPhDISXS_LIBRARY}      )
++  set( GPHDISEG     ${GPhDISEG_LIBRARY}      )
++  set( GPHDFRCXS    ${GPhDfrcXS_LIBRARY}     )
++  set( GPHDFRCEG    ${GPhDfrcEG_LIBRARY}     )
++  set( GPHGLWRESXS  ${GPhGlwResXS_LIBRARY}   )
++  set( GPHGLWRESEG  ${GPhGlwResEG_LIBRARY}   )
++  set( GPHIBDXS     ${GPhIBDXS_LIBRARY}      )
++  set( GPHIBDEG     ${GPhIBDEG_LIBRARY}      )
++  set( GPHMNUCXS    ${GPhMNucXS_LIBRARY}     )
++  set( GPHMNUCEG    ${GPhMNucEG_LIBRARY}     )
++  set( GPHMEL       ${GPhMEL_LIBRARY}        )
++  set( GPHNUELXS    ${GPhNuElXS_LIBRARY}     )
++  set( GPHNUELEG    ${GPhNuElEG_LIBRARY}     )
++  set( GPHQELXS     ${GPhQELXS_LIBRARY}      )
++  set( GPHQELEG     ${GPhQELEG_LIBRARY}      )
++  set( GPHRESXS     ${GPhResXS_LIBRARY}      )
++  set( GPHRESEG     ${GPhResEG_LIBRARY}      )
++  set( GPHSTRXS     ${GPhStrXS_LIBRARY}      )
++  set( GPHSTREG     ${GPhStrEG_LIBRARY}      )
++  set( GPHNDCY      ${GPhNDcy_LIBRARY}       )
++  set( GTLGEO       ${GTlGeo_LIBRARY}        )
++  set( GTLFLX       ${GTlFlx_LIBRARY}        )
++  set( GRWFWK       ${GRwFwk_LIBRARY}        )
++  set( GRWIO        ${GRwIO_LIBRARY}         )
++  set( GRWCLC       ${GRwClc_LIBRARY}        )
+ 
+ ## (continued) GENIE pre-R-3 used GSL via ROOT's Math libs, now makes direct call not available via that route
+ cet_find_library( GSL NAMES gsl PATHS ENV GSL_LIB NO_DEFAULT_PATH )
+@@ -193,8 +193,7 @@ include(ArtMake)
+ include(BuildPlugins)
+ 
+ add_subdirectory(sbncode)
+-add_subdirectory(ups)
+ add_subdirectory(fcl)
+ 
+ # packaging utility
+-include(UseCPack)
++cet_cmake_config()
+diff --git a/sbncode/BeamSpillInfoRetriever/BNBRetriever/BNBRetriever_module.cc b/sbncode/BeamSpillInfoRetriever/BNBRetriever/BNBRetriever_module.cc
+index a1f29a3..1b724a4 100644
+--- a/sbncode/BeamSpillInfoRetriever/BNBRetriever/BNBRetriever_module.cc
++++ b/sbncode/BeamSpillInfoRetriever/BNBRetriever/BNBRetriever_module.cc
+@@ -24,7 +24,7 @@
+ 
+ #include "sbnobj/Common/POTAccounting/BNBSpillInfo.h"
+ 
+-#include "IFBeam_service.h"
++#include "ifdh_art/IFBeamService/IFBeam_service.h"
+ #include "ifbeam_c.h"
+ #include "MWRData.h"
+ 
+diff --git a/sbncode/BeamSpillInfoRetriever/BNBRetriever/CMakeLists.txt b/sbncode/BeamSpillInfoRetriever/BNBRetriever/CMakeLists.txt
+index 99ec10d..5e392b0 100644
+--- a/sbncode/BeamSpillInfoRetriever/BNBRetriever/CMakeLists.txt
++++ b/sbncode/BeamSpillInfoRetriever/BNBRetriever/CMakeLists.txt
+@@ -1,16 +1,18 @@
+-find_ups_product(ifbeam)
+-find_ups_product(ifbeam_art)
++find_package(ifbeam)
++find_package(ifbeam_art)
+ 
+-include_directories( $ENV{IFBEAM_FQ_DIR}/include )
+-include_directories( $ENV{LIBWDA_FQ_DIR}/include )
+-include_directories( $ENV{IFDHC_FQ_DIR}/inc )
+-include_directories( $ENV{IFDH_ART_INC} )
+-cet_find_library( IFBEAMSERVICE        NAMES IFBeam_service    PATHS ENV IFDH_ART_LIB NO_DEFAULT_PATH )
+-cet_find_library( IFBEAM               NAMES ifbeam            PATHS ENV IFBEAM_LIB   NO_DEFAULT_PATH )
++include_directories( $ENV{IFBEAM_DIR}/include )
++include_directories( $ENV{LIBWDA_DIR}/include )
++link_directories( $ENV{LIBWDA_DIR}/lib )
++include_directories( $ENV{IFDHC_DIR}/inc )
++link_directories( $ENV{IFDHC_DIR}/lib )
++include_directories( $ENV{IFDH_ART_DIR}/include )
++include_directories( $ENV{TRACE_INC} )
++find_library( IFBEAM               NAMES ifbeam            PATHS $ENV{IFBEAM_DIR} )
+ 
+ link_libraries( ${LIB_NAME} -L$ENV{BOOST_LIB} -lboost_system ${ROOTLIB} )
+ 
+-art_make_library(
++cet_make_library(LIBRARIES Boost::system
+ 	LIBRARY_NAME sbn_BNBSpillInfoRetriever_MWRData
+ 	SOURCE MWRData.cpp
+ )
+@@ -21,28 +23,27 @@ simple_plugin(BNBRetriever module
+ 	${ART_FRAMEWORK_SERVICES_REGISTRY}
+ 	${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+ 	${ART_FRAMEWORK_PRINCIPAL}
+-	art_Persistency_Common
+-	art_Utilities canvas
++	art::Persistency_Common
++	art::Utilities canvas::canvas
+ 	${MF_MESSAGELOGGER}
+ 	${MF_UTILITIES}
+ 	${FHICLCPP}
+-	cetlib cetlib_except
++	cetlib::cetlib cetlib_except::cetlib_except
+ 	${ROOT_EVE_LIB_LIST}
+-	${ROOT_X3d}
++	ROOT::X3d
+ 	${ROOT_BASIC_LIB_LIST}
+         ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_DATE_TIME_LIBRARY} ${Boost_SERIALIZATION_LIBRARY}
+-        ${Boost_SYSTEM_LIBRARY}
+-	MF_MessageLogger
+-       	sbnobj_Common_POTAccounting
+-	#${IFBEAMSERVICE}
+-	#${IFBEAM}
+-	ifbeam
+-	ifdh_art::IFBeam_service
++        Boost::system
++	messagefacility::MF_MessageLogger
++	ifbeam::ifbeam
++        ifdh_art::IFBeam_service
+ 	sbndaq_artdaq_core::sbndaq-artdaq-core_Overlays_Common
+   	sbndaq_artdaq_core::sbndaq-artdaq-core_Overlays
+ 	sbndaq_artdaq_core::sbndaq-artdaq-core_Overlays_ICARUS	
+         artdaq_core::artdaq-core_Utilities
+-	sbn_BNBSpillInfoRetriever_MWRData	
++	sbn_BNBSpillInfoRetriever_MWRData
++        sbnobj::Common_POTAccounting
++        larcorealg::CoreUtils	
+ )
+ 
+ install_headers()
+diff --git a/sbncode/BeamSpillInfoRetriever/EXTRetriever/CMakeLists.txt b/sbncode/BeamSpillInfoRetriever/EXTRetriever/CMakeLists.txt
+index 4a3ceaf..12a9289 100644
+--- a/sbncode/BeamSpillInfoRetriever/EXTRetriever/CMakeLists.txt
++++ b/sbncode/BeamSpillInfoRetriever/EXTRetriever/CMakeLists.txt
+@@ -1,24 +1,27 @@
+ 
+-include_directories( $ENV{IFBEAM_FQ_DIR}/include )
+-include_directories( $ENV{LIBWDA_FQ_DIR}/include )
+-include_directories( $ENV{IFDHC_FQ_DIR}/inc )
+-include_directories( $ENV{IFDH_ART_INC} )
++include_directories( $ENV{IFBEAM_DIR}/include )
++include_directories( $ENV{LIBWDA_DIR}/include )
++include_directories( $ENV{IFDHC_DIR}/inc )
++include_directories( $ENV{IFDH_ART_DIR}/include )
++include_directories( $ENV{TRACE_INC} )
+ 
+ simple_plugin(EXTRetriever module
+ 	${ART_FRAMEWORK_CORE}
+ 	${ART_FRAMEWORK_SERVICES_REGISTRY}
+ 	${ART_FRAMEWORK_SERVICES}
+ 	${ART_FRAMEWORK_PRINCIPAL}
+-	art_Persistency_Common
+-	art_Utilities canvas
++	art::Persistency_Common
++	art::Utilities canvas::canvas
+ 	${FHICLCPP}
+-	cetlib cetlib_except
+-	MF_MessageLogger
+-       	sbnobj_Common_POTAccounting
++	cetlib::cetlib cetlib_except::cetlib_except
++	messagefacility::MF_MessageLogger
++       	sbnobj::Common_POTAccounting
+ 	sbndaq_artdaq_core::sbndaq-artdaq-core_Overlays_Common
+   	sbndaq_artdaq_core::sbndaq-artdaq-core_Overlays
+ 	sbndaq_artdaq_core::sbndaq-artdaq-core_Overlays_ICARUS	
+         artdaq_core::artdaq-core_Utilities
++        lardata::Utilities
++        larcore::Geometry_AuxDetGeometry_service
+ )
+ 
+ install_headers()
+diff --git a/sbncode/BeamSpillInfoRetriever/NuMIRetriever/CMakeLists.txt b/sbncode/BeamSpillInfoRetriever/NuMIRetriever/CMakeLists.txt
+index 0fc3737..b98c622 100644
+--- a/sbncode/BeamSpillInfoRetriever/NuMIRetriever/CMakeLists.txt
++++ b/sbncode/BeamSpillInfoRetriever/NuMIRetriever/CMakeLists.txt
+@@ -1,3 +1,5 @@
++find_package(ifbeam)
++find_package(ifbeam_art)
+ include_directories( $ENV{IFBEAM_FQ_DIR}/include )
+ include_directories( $ENV{LIBWDA_FQ_DIR}/include )
+ include_directories( $ENV{IFDHC_FQ_DIR}/inc )
+@@ -6,13 +8,14 @@ cet_find_library( IFBEAMSERVICE        NAMES IFBeam_service    PATHS ENV IFDH_AR
+ cet_find_library( IFBEAM               NAMES ifbeam            PATHS ENV IFBEAM_LIB   NO_DEFAULT_PATH )
+ 
+ 
++
+ simple_plugin(NuMIRetriever module
+         ${ART_FRAMEWORK_CORE}
+         ${ART_FRAMEWORK_SERVICES_REGISTRY}
+         ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+         ${ART_FRAMEWORK_PRINCIPAL}
+-        art_Persistency_Common
+-        art_Utilities canvas
++        art::Persistency_Common
++        art::Utilities canvas::canvas
+         ${MF_MESSAGELOGGER}
+         ${MF_UTILITIES}
+         ${FHICLCPP}
+@@ -22,11 +25,11 @@ simple_plugin(NuMIRetriever module
+         ${ROOT_BASIC_LIB_LIST}
+         ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_DATE_TIME_LIBRARY} ${Boost_SERIALIZATION_LIBRARY}
+         ${Boost_SYSTEM_LIBRARY}
+-        MF_MessageLogger
+-        sbnobj_Common_POTAccounting
++        messagefacility::MF_MessageLogger
++        sbnobj::Common_POTAccounting
+         #${IFBEAMSERVICE}
+         #${IFBEAM}
+-	ifbeam
++	ifbeam::ifbeam
+ 	ifdh_art::IFBeam_service
+         sbndaq_artdaq_core::sbndaq-artdaq-core_Overlays_Common
+         sbndaq_artdaq_core::sbndaq-artdaq-core_Overlays
+diff --git a/sbncode/BeamSpillInfoRetriever/NuMIRetriever/NuMIRetriever_module.cc b/sbncode/BeamSpillInfoRetriever/NuMIRetriever/NuMIRetriever_module.cc
+index fcf71fa..1c05415 100644
+--- a/sbncode/BeamSpillInfoRetriever/NuMIRetriever/NuMIRetriever_module.cc
++++ b/sbncode/BeamSpillInfoRetriever/NuMIRetriever/NuMIRetriever_module.cc
+@@ -25,7 +25,7 @@
+ #include "lardata/DetectorInfoServices/DetectorPropertiesService.h"
+ #include "sbnobj/Common/POTAccounting/NuMISpillInfo.h"
+ 
+-#include "IFBeam_service.h"
++#include "ifdh_art/IFBeamService/IFBeam_service.h"
+ #include "ifbeam_c.h"
+ //#include "MWRData.h"
+ 
+diff --git a/sbncode/CAFMaker/CAFMaker_module.cc b/sbncode/CAFMaker/CAFMaker_module.cc
+index 8cabed3..3e14be3 100644
+--- a/sbncode/CAFMaker/CAFMaker_module.cc
++++ b/sbncode/CAFMaker/CAFMaker_module.cc
+@@ -38,7 +38,7 @@
+ #include <libgen.h>
+ #endif
+ 
+-#include <IFDH_service.h>
++#include "ifdh_art/IFDHService/IFDH_service.h"
+ 
+ // ROOT includes
+ #include "TFile.h"
+diff --git a/sbncode/CAFMaker/CMakeLists.txt b/sbncode/CAFMaker/CMakeLists.txt
+index bb2a232..10fd327 100644
+--- a/sbncode/CAFMaker/CMakeLists.txt
++++ b/sbncode/CAFMaker/CMakeLists.txt
+@@ -1,87 +1,86 @@
+ # for classes_def.xml
+-include_directories ( ${CMAKE_CURRENT_SOURCE_DIR} )
++include_directories ( ${CMAKE_CURRENT_SOURCE_DIR} ) ### MIGRATE-ACTION-RECOMMENDED: use target_link_directories() with target semantics
+ #set( PACKAGE CAFMaker )
+ FILE( GLOB src_files *.cxx )
+ 
+ add_subdirectory(RecoUtils)
+ add_subdirectory(bin)
+ 
+-art_make_library( LIBRARY_NAME sbncode_CAFMaker
++include_directories( $ENV{SRPROXY_DIR}/include )
++art_make_library( LIBRARY_NAME sbncode::CAFMaker
+                   SOURCE ${src_files}
+                   LIBRARIES
+-                  sbnanaobj_StandardRecord
+-                  sbnanaobj_StandardRecordFlat
+-                  ${ART_FRAMEWORK_CORE}
+-                  ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                  ${ART_ROOT_IO_TFILESERVICE_SERVICE}
+-                  ${ART_FRAMEWORK_SERVICES}
+-                  ${ART_FRAMEWORK_PRINCIPAL}
+-                  art_Persistency_Common
+-                  art_Utilities canvas
++                  ifdh_art::IFDH_service
++                  sbnanaobj::StandardRecord
++                  sbnanaobj::StandardRecordFlat
++                  art::Framework_Core
++                  art::Framework_Services_Registry
++                  art_root_io::TFileService_service
++                  art::Framework_Principal
++                  art::Persistency_Common
++                  art::Utilities canvas::canvas
+                   ${MF_MESSAGELOGGER}
+                   ${MF_UTILITIES}
+                   ${FHICLCPP}
+-                  cetlib cetlib_except
++                  cetlib::cetlib cetlib_except::cetlib_except
+                   ${ROOT_EVE_LIB_LIST}
+-                  ${ROOT_X3d}
+-                  ${ROOT_BASIC_LIB_LIST}
++                  ROOT::X3d
++                  ROOT::EG
+                   caf_RecoUtils
+-                  lardataobj_AnalysisBase
+-                  lardataobj_RecoBase
+-                  larcorealg_Geometry
+-                  larcore_Geometry_Geometry_service
+-                  larcorealg_GeoAlgo
+-                  larsim_MCCheater_BackTrackerService_service
+-                  larsim_Utils
+-                  nusimdata_SimulationBase
+-                  larsim_MCCheater_ParticleInventoryService_service
+-                  sbnobj_Common_CRT
+-                  sbnobj_Common_Reco
+-                  sbnobj_Common_Analysis
+-		  lardataalg_DetectorInfo
+-                  art_Framework_Services_System_TriggerNamesService_service
+-                  sbncode_Metadata_MetadataSBN_service
++                  lardataobj::AnalysisBase
++                  lardataobj::RecoBase
++                  larcorealg::Geometry
++                  larcore::Geometry_Geometry_service
++                  larcorealg::GeoAlgo
++                  larsim::MCCheater_BackTrackerService_service
++                  nusimdata::SimulationBase
++                  larsim::MCCheater_ParticleInventoryService_service
++                  sbnobj::Common_CRT
++                  sbnobj::Common_Reco
++                  sbnobj::Common_Analysis
++		  lardataalg::DetectorInfo
++                  art::Framework_Services_System_TriggerNamesService_service
++                  sbncode::Metadata_MetadataSBN_service
++                  larsim::Utils
+                   )
+ 
+-cet_find_library( IFDH NAMES ifdh PATHS ENV IFDHC_LIB NO_DEFAULT_PATH )
+-##include_directories( $ENV{IFDHC_FQ_DIR}/inc )
+-##include_directories( $ENV{IFDH_ART_FQ_DIR}/inc )
++include_directories( $ENV{IFDHC_DIR}/inc ) ### MIGRATE-ACTION-RECOMMENDED: use target_link_directories() with target semantics
++link_directories( $ENV{IFDHC_DIR}/lib )
+ 
+-include_directories( $ENV{SRPROXY_INC} )
+-
+-cet_find_library( IFDH_SERVICE NAMES IFDH_service PATHS ENV IFDH_ART_LIB )
+-
+-simple_plugin ( CAFMaker module
+-               sbncode_CAFMaker
+-               sbnanaobj_StandardRecord
+-               IFDH_SERVICE
+-               ${ART_FRAMEWORK_CORE}
+-               ${ART_FRAMEWORK_PRINCIPAL}
+-               ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-               ${ART_FRAMEWORK_SERVICES_BASIC}
+-               ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+-               art_Utilities canvas
++cet_build_plugin ( CAFMaker art::module
++               LIBRARIES
++               sbncode::CAFMaker
++               sbnanaobj::StandardRecord
++               larcorealg::Geometry
++               ifdh_art::IFDH_service
++               art::Framework_Core
++               art::Framework_Principal
++               art::Framework_Services_Registry
++               art::Utilities canvas::canvas
+                ${MF_MESSAGELOGGER}
+                ${MF_UTILITIES}
+                ${FHICLCPP}
+-               cetlib cetlib_except
+-               ${ROOT_BASIC_LIB_LIST}
+-               art_root_io_RootDB
+-               hep_concurrency
+-               nurandom_RandomUtils_NuRandomService_service
++               cetlib::cetlib cetlib_except::cetlib_except
++               ROOT::Core ROOT::Tree
++               art_root_io::RootDB
++               hep_concurrency::hep_concurrency
++                  lardataobj::RecoBase
++               nurandom::RandomUtils_NuRandomService_service
+                BASENAME_ONLY
+             )
+ 
+ build_dictionary( CAFMaker
+                   DICTIONARY_LIBRARIES
+-                  sbnanaobj_StandardRecord
+-                  sbnanaobj_StandardRecord_dict
+-                  ${ART_FRAMEWORK_CORE}
+-                  ${ART_FRAMEWORK_PRINCIPAL}
+-                  art_Persistency_Common
+-                  art_Persistency_Provenance
+-                  art_Utilities canvas
+-                  cetlib cetlib_except
++                  sbnanaobj::StandardRecord
++                  sbnanaobj::StandardRecord_dict
++                  lardataobj::RecoBase
++                  larcorealg::Geometry
++                  art::Framework_Core
++                  art::Framework_Principal
++                  art::Persistency_Common
++                  art::Persistency_Provenance
++                  art::Utilities canvas::canvas
++                  cetlib::cetlib cetlib_except::cetlib_except
+                   ${MF_MESSAGELOGGER}
+                   ${MF_UTILITIES}
+                   )
+diff --git a/sbncode/CAFMaker/RecoUtils/CMakeLists.txt b/sbncode/CAFMaker/RecoUtils/CMakeLists.txt
+index fe2ecf7..e67a4b7 100644
+--- a/sbncode/CAFMaker/RecoUtils/CMakeLists.txt
++++ b/sbncode/CAFMaker/RecoUtils/CMakeLists.txt
+@@ -2,18 +2,18 @@
+ art_make_library( LIBRARY_NAME caf_RecoUtils
+                   SOURCE  RecoUtils.cc
+                   LIBRARIES 
+-		    ${ART_FRAMEWORK_CORE}
+-		    ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-		    ${ART_FRAMEWORK_SERVICES}
+-		    ${ART_FRAMEWORK_PRINCIPAL}
+-		    art_Persistency_Common
+-		    art_Utilities canvas
++		    art::Framework_Core
++		    art::Framework_Services_Registry
++		    art::Framework_Principal
++		    art::Persistency_Common
++		    art::Utilities canvas::canvas
+                     ${ROOT_BASIC_LIB_LIST}
+ 		    ${MF_MESSAGELOGGER}
+ 		    ${MF_UTILITIES}
+ 		    ${FHICLCPP}
+-                    cetlib cetlib_except
+-		    larsim_MCCheater_BackTrackerService_service
+-		    larsim_MCCheater_ParticleInventoryService_service
+-                    larcorealg_Geometry
++                    cetlib::cetlib cetlib_except::cetlib_except
++		    larsim::MCCheater_BackTrackerService_service
++		    larsim::MCCheater_ParticleInventoryService_service
++                    larcorealg::Geometry
++                    larcore::Geometry_DumpGeometry_module
+                 )
+diff --git a/sbncode/CAFMaker/bin/CMakeLists.txt b/sbncode/CAFMaker/bin/CMakeLists.txt
+index 747d8fc..d68f26c 100644
+--- a/sbncode/CAFMaker/bin/CMakeLists.txt
++++ b/sbncode/CAFMaker/bin/CMakeLists.txt
+@@ -1,6 +1,6 @@
+ cet_make_exec( extractCAFMetadata
+                SOURCE extractCAFMetadata.cc
+-               LIBRARIES ${ROOT_BASIC_LIB_LIST}
++               LIBRARIES ROOT::Core ROOT::RIO
+                )
+ 
+ cet_script(diff_cafs)
+diff --git a/sbncode/CMakeLists.txt b/sbncode/CMakeLists.txt
+index 33ea935..d5f0346 100644
+--- a/sbncode/CMakeLists.txt
++++ b/sbncode/CMakeLists.txt
+@@ -3,7 +3,7 @@ cet_find_library( BOOST_DATE_TIME     NAMES boost_date_time     PATHS ENV BOOST_
+ cet_find_library( IFBEAM NAMES ifbeam PATHS ENV IFBEAM_LIB NO_DEFAULT_PATH )
+ cet_find_library( WDA NAMES wda PATHS ENV LIBWDA_LIB NO_DEFAULT_PATH )
+ 
+-find_ups_product(sbnanaobj)
++find_package(sbnanaobj) ### MIGRATE-ACTION-RECOMMENDED: use cet_find_package() with target semantics for linking
+ 
+ add_subdirectory(SBNEventWeight)
+ add_subdirectory(NuMuSelection)
+diff --git a/sbncode/Calibration/CMakeLists.txt b/sbncode/Calibration/CMakeLists.txt
+index 827749a..c59ba5a 100644
+--- a/sbncode/Calibration/CMakeLists.txt
++++ b/sbncode/Calibration/CMakeLists.txt
+@@ -1,88 +1,96 @@
+-link_directories(
++link_directories( ### MIGRATE-ACTION-RECOMMENDED: use target_link_libraries() with target semantics
+  $ENV{ROOTSYS}/lib
+ )
+ 
+ simple_plugin( TrackCaloSkimmer module
+-                            ${ART_FRAMEWORK_CORE}
+-                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-                            ${ART_FRAMEWORK_PRINCIPAL}
+-                            art_Persistency_Common
+-                            art_Utilities canvas
++                            art::Framework_Core
++                            art::Framework_Services_Registry
++                            art_root_io::TFileService_service
++                            art::Framework_Principal
++                            art::Persistency_Common
++                            art::Utilities canvas::canvas
+                             ${MF_MESSAGELOGGER}
+                             ${MF_UTILITIES}
+                             ${FHICLCPP}
+-                            cetlib cetlib_except
++                            cetlib::cetlib cetlib_except::cetlib_except
+                             ${ROOT_EVE_LIB_LIST}
+-                            ${ROOT_X3d}
++                            ROOT::X3d
+                             ${ROOT_BASIC_LIB_LIST}
+-	art_root_io_tfile_support
+-	art_root_io
+-	art_root_io_dict
+-        lardataobj_AnalysisBase
+-        lardataobj_RecoBase
+-        larcorealg_Geometry
+-        larcore_Geometry_Geometry_service
+-        larcorealg_GeoAlgo
+-	sbnobj_Common_Reco
+-	larcorealg_GeoAlgo
+-	lardata_DetectorInfoServices_DetectorPropertiesServiceStandard_service
+-	lardataalg_DetectorInfo
+-	Minuit
+-	sbncode_CAFMaker
++	art_root_io::tfile_support
++	art_root_io::art_root_io
++	art_root_io::dict
++        lardataobj::AnalysisBase
++        lardataobj::RecoBase
++        larcorealg::Geometry
++        larcore::Geometry_Geometry_service
++        larcorealg::GeoAlgo
++	sbnobj::Common_Reco
++	larcorealg::GeoAlgo
++	lardata::DetectorInfoServices_DetectorPropertiesServiceStandard_service
++	lardataalg::DetectorInfo
++	ROOT::Minuit
++	sbncode::CAFMaker
++        sbnobj::Common_Calibration_dict
++        larevt::SpaceCharge
+ )
+ 
+ simple_plugin(TrackCaloSkimmerSelectStoppingTrack tool
+-                            ${ART_FRAMEWORK_CORE}
+-                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-                            ${ART_FRAMEWORK_PRINCIPAL}
+-                            art_Persistency_Common
+-                            art_Utilities canvas
++                            art::Framework_Core
++                            art::Framework_Services_Registry
++                            art_root_io::TFileService_service
++                            art::Framework_Principal
++                            art::Persistency_Common
++                            art::Utilities canvas::canvas
+                             ${MF_MESSAGELOGGER}
+                             ${MF_UTILITIES}
+                             ${FHICLCPP}
+-                            cetlib cetlib_except
++                            cetlib::cetlib cetlib_except::cetlib_except
+                             ${ROOT_EVE_LIB_LIST}
+-                            ${ROOT_X3d}
++                            ROOT::X3d
+                             ${ROOT_BASIC_LIB_LIST}
+-        larcorealg_Geometry
+-	larcorealg_GeoAlgo
+-	lardata_DetectorInfoServices_DetectorPropertiesServiceStandard_service
+-	lardataalg_DetectorInfo
++        larcorealg::Geometry
++	larcorealg::GeoAlgo
++	lardata::DetectorInfoServices_DetectorPropertiesServiceStandard_service
++	lardataalg::DetectorInfo
++        larevt::SpaceCharge
++        sbnobj::Common_Calibration_dict
+ )
+ 
+ simple_plugin(TrackCaloSkimmerSelectAnode2CathodeTrack tool
+-                            ${ART_FRAMEWORK_CORE}
+-                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-                            ${ART_FRAMEWORK_PRINCIPAL}
+-                            art_Persistency_Common
+-                            art_Utilities canvas
++                            art::Framework_Core
++                            art::Framework_Services_Registry
++                            art_root_io::TFileService_service
++                            art::Framework_Principal
++                            art::Persistency_Common
++                            art::Utilities canvas::canvas
+                             ${MF_MESSAGELOGGER}
+                             ${MF_UTILITIES}
+                             ${FHICLCPP}
+-                            cetlib cetlib_except
++                            cetlib::cetlib cetlib_except::cetlib_except
+                             ${ROOT_EVE_LIB_LIST}
+-                            ${ROOT_X3d}
++                            ROOT::X3d
+                             ${ROOT_BASIC_LIB_LIST}
++        sbnobj::Common_Calibration_dict
++        larevt::SpaceCharge
+ )
+ 
++link_directories( $ENV{IFDHC_DIR}/lib )
+ simple_plugin ( DataSelect module
+-                IFDH_SERVICE
+-               ${ART_FRAMEWORK_CORE}
+-               ${ART_FRAMEWORK_PRINCIPAL}
+-               ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-               ${ART_FRAMEWORK_SERVICES_BASIC}
+-               ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+-               art_Utilities canvas
++               ifdh_art::IFDH_service
++               art::Framework_Core
++               art::Framework_Principal
++               art::Framework_Services_Registry
++               art::Utilities canvas::canvas
+                ${MF_MESSAGELOGGER}
+                ${MF_UTILITIES}
+                ${FHICLCPP}
+-               cetlib cetlib_except
++               cetlib::cetlib cetlib_except::cetlib_except
+         ${ROOT_EVE_LIB_LIST}
+-        ${ROOT_X3d}
++        ROOT::X3d
+         ${ROOT_BASIC_LIB_LIST}
++        sbnobj::Common_Calibration_dict
++	larevt::SpaceCharge
++        lardataobj::RecoBase
+ )
+ 
+ 
+diff --git a/sbncode/EventGenerator/MeVPrtl/CMakeLists.txt b/sbncode/EventGenerator/MeVPrtl/CMakeLists.txt
+index 6d63008..e896bdc 100644
+--- a/sbncode/EventGenerator/MeVPrtl/CMakeLists.txt
++++ b/sbncode/EventGenerator/MeVPrtl/CMakeLists.txt
+@@ -1,65 +1,64 @@
+-find_ups_product(ifdhc)
+-find_ups_product(dk2nudata)
+-find_ups_product(dk2nugenie)
++find_package(ifdhc) ### MIGRATE-ACTION-RECOMMENDED: use cet_find_package() with target semantics for linking
++find_package(dk2nudata) ### MIGRATE-ACTION-RECOMMENDED: use cet_find_package() with target semantics for linking
++find_package(dk2nugenie) ### MIGRATE-ACTION-RECOMMENDED: use cet_find_package() with target semantics for linking
+ 
+-link_directories( $ENV{ROOTSYS}/lib )
+-link_directories( $ENV{DK2NUDATA_LIB} )
+-link_directories( $ENV{DK2NUGENIE_LIB} )
++link_directories( $ENV{ROOTSYS}/lib ) ### MIGRATE-ACTION-RECOMMENDED: use target_link_libraries() with target semantics
++link_directories( $ENV{DK2NUDATA_LIB} ) ### MIGRATE-ACTION-RECOMMENDED: use target_link_libraries() with target semantics
++link_directories( $ENV{DK2NUGENIE_LIB} ) ### MIGRATE-ACTION-RECOMMENDED: use target_link_libraries() with target semantics
+ 
+ add_subdirectory(Tools)
+ add_subdirectory(config)
+ 
+ simple_plugin( MeVPrtlGen module
+-              ${ART_FRAMEWORK_CORE}
+-              ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-              ${ART_ROOT_IO_TFILESERVICE_SERVICE}
+-              ${ART_FRAMEWORK_SERVICES}
+-				      ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+-				      ${ART_ROOT_IO_TFILE_SUPPORT}
+-              ${ART_FRAMEWORK_PRINCIPAL}
+-              art_Persistency_Common
+-              art_Utilities canvas
++              art::Framework_Core
++              art::Framework_Services_Registry
++              art_root_io::TFileService_service
++				      art_root_io::TFileService_service
++				      art_root_io::tfile_support
++              art::Framework_Principal
++              art::Persistency_Common
++              art::Utilities canvas::canvas
+               ${MF_MESSAGELOGGER}
+               ${MF_UTILITIES}
+               ${FHICLCPP}
+-              cetlib cetlib_except
++              cetlib::cetlib cetlib_except::cetlib_except
+               ${ROOT_EVE_LIB_LIST}
+               ${ROOT_X3d}
+               ${ROOT_CORE}
+               ${ROOT_BASIC_LIB_LIST}
+         			${ROOT_XMLIO}
+-        			${CLHEP}
+-		nusimdata_SimulationBase
+-              larcorealg_Geometry
+-        			nurandom_RandomUtils_NuRandomService_service
+-        			larcoreobj_SummaryData
+-        			sbnobj_Common_EventGen_MeVPrtl
+-        			sbncode_EventGenerator_MeVPrtl_Constants
++        			CLHEP::CLHEP
++		nusimdata::SimulationBase
++              larcorealg::Geometry
++        			nurandom::RandomUtils_NuRandomService_service
++        			larcoreobj::SummaryData
++        			sbnobj::Common_EventGen_MeVPrtl
++        			sbncode::EventGenerator_MeVPrtl_Constants
+ )
+ 
+ simple_plugin( MeVPrtlTestRayTrace module
+-                            ${ART_FRAMEWORK_CORE}
+-                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-				${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+-				${ART_ROOT_IO_TFILE_SUPPORT}
+-                            ${ART_FRAMEWORK_PRINCIPAL}
+-                            art_Persistency_Common
+-                            art_Utilities canvas
++                            art::Framework_Core
++                            art::Framework_Services_Registry
++                            art_root_io::TFileService_service
++				art_root_io::TFileService_service
++				art_root_io::tfile_support
++                            art::Framework_Principal
++                            art::Persistency_Common
++                            art::Utilities canvas::canvas
+                             ${MF_MESSAGELOGGER}
+                             ${MF_UTILITIES}
+                             ${FHICLCPP}
+-                            cetlib cetlib_except
++                            cetlib::cetlib cetlib_except::cetlib_except
+                             ${ROOT_EVE_LIB_LIST}
+                             ${ROOT_X3d}
+                             ${ROOT_CORE}
+                             ${ROOT_BASIC_LIB_LIST}
+ 			${ROOT_XMLIO}
+-			${CLHEP}
+-			nurandom_RandomUtils_NuRandomService_service
+-			larcoreobj_SummaryData
+-        		sbnobj_Common_EventGen_MeVPrtl
+-			sbncode_EventGenerator_MeVPrtl_Constants
++			CLHEP::CLHEP
++			nurandom::RandomUtils_NuRandomService_service
++			larcoreobj::SummaryData
++        		sbnobj::Common_EventGen_MeVPrtl
++			sbncode::EventGenerator_MeVPrtl_Constants
+ )
+ 
+ 
+diff --git a/sbncode/EventGenerator/MeVPrtl/Tools/CMakeLists.txt b/sbncode/EventGenerator/MeVPrtl/Tools/CMakeLists.txt
+index 3f1d1f6..bb50c69 100644
+--- a/sbncode/EventGenerator/MeVPrtl/Tools/CMakeLists.txt
++++ b/sbncode/EventGenerator/MeVPrtl/Tools/CMakeLists.txt
+@@ -1,150 +1,155 @@
+-link_directories( $ENV{ROOTSYS}/lib )
+ 
+-art_make_library( LIBRARY_NAME sbncode_EventGenerator_MeVPrtl_Constants
++find_library( IFDH NAMES ifdh PATHS $ENV{IFDHC_DIR}/lib) ### MIGRATE-ACTION-RECOMMENDED: use of ENV ... may be UPS-dependent ### MIGRATE-ACTION-RECOMMENDED: use cet_find_package() with target semantics for linking
++include_directories( $ENV{IFDHC_DIR}/inc ) ### MIGRATE-ACTION-RECOMMENDED: use target_link_directories() with target semantics
++
++find_library( DK2NUTREE NAMES dk2nuTree PATHS $ENV{DK2NUDATA_LIB})
++find_library( DK2NUGENIE NAMES dk2nuGenie PATHS $ENV{DK2NUGENIE_LIB})
++
++art_make_library( LIBRARY_NAME sbncode::EventGenerator_MeVPrtl_Constants
+           SOURCE Constants.cpp
+           LIBRARIES
+-                        ${ROOT_BASIC_LIB_LIST}
+-                        ${ROOT_EVE_LIB_LIST}
+-                        ${ROOT_X3d}
+-                            ${FHICLCPP}
+-                            cetlib cetlib_except
++                        ROOT::Core
++                        ROOT::Eve
++                        ROOT::X3d
++                            fhiclcpp::fhiclcpp
++                            cetlib::cetlib cetlib_except::cetlib_except
+         )
+ 
+ 
+ simple_plugin( EmptyKaonGen tool
+-                            ${ART_FRAMEWORK_CORE}
+-                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-                            ${ART_FRAMEWORK_PRINCIPAL}
+-                            art_Persistency_Common
+-                            art_Utilities canvas
++                            art::Framework_Core
++                            art::Framework_Services_Registry
++                            art_root_io::TFileService_service
++                            art::Framework_Principal
++                            art::Persistency_Common
++                            art::Utilities canvas::canvas
+                             ${MF_MESSAGELOGGER}
+                             ${MF_UTILITIES}
+-                            ${FHICLCPP}
+-                            cetlib cetlib_except
+-                            ${ROOT_EVE_LIB_LIST}
+-                            ${ROOT_X3d}
+-                            ${ROOT_BASIC_LIB_LIST}
+-			${CLHEP}
+-			nurandom_RandomUtils_NuRandomService_service
+-			nusimdata_SimulationBase
+-			sbncode_EventGenerator_MeVPrtl_Constants
++                            fhiclcpp::fhiclcpp
++                            cetlib::cetlib cetlib_except::cetlib_except
++                            ROOT::Eve
++                            ROOT::X3d
++                            ROOT::Core
++			CLHEP::CLHEP
++			nurandom::RandomUtils_NuRandomService_service
++			nusimdata::SimulationBase
++			sbncode::EventGenerator_MeVPrtl_Constants
++                        sbnobj::Common_EventGen_MeVPrtl
+ )
+ 
+-cet_find_library( IFDH NAMES ifdh PATHS ENV IFDHC_LIB NO_DEFAULT_PATH )
+-##include_directories( $ENV{IFDHC_FQ_DIR}/inc )
+-##include_directories( $ENV{IFDH_ART_FQ_DIR}/inc )
+-
+-cet_find_library( IFDH_SERVICE NAMES IFDH_service PATHS ENV IFDH_ART_LIB )
+-
+ 
+ simple_plugin( NuMiKaonGen tool
+-                            IFDH_SERVICE
+-                            ${ART_FRAMEWORK_CORE}
+-                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-                            ${ART_FRAMEWORK_PRINCIPAL}
+-                            art_Persistency_Common
+-                            art_Utilities canvas
++                            ifdh_art::IFDH_service
++                            art::Framework_Core
++                            art::Framework_Services_Registry
++                            art_root_io::TFileService_service 
++                            art::Framework_Principal
++                            art::Persistency_Common
++                            art::Utilities canvas::canvas
+                             ${MF_MESSAGELOGGER}
+                             ${MF_UTILITIES}
+-                            ${FHICLCPP}
+-                            cetlib cetlib_except
+-                            ${ROOT_EVE_LIB_LIST}
+-                            ${ROOT_X3d}
+-                            ${ROOT_BASIC_LIB_LIST}
+-			${CLHEP}
+-			ifdh
+-			dk2nuTree
+-			nurandom_RandomUtils_NuRandomService_service
+-			nusimdata_SimulationBase
+-			sbncode_EventGenerator_MeVPrtl_Constants
++                            fhiclcpp::fhiclcpp
++                            cetlib::cetlib cetlib_except::cetlib_except
++                            ROOT::Eve
++                            ROOT::X3d
++                            ROOT::Core
++			CLHEP::CLHEP
++			ifdh::ifdh
++			${DK2NUTREE}
++			nurandom::RandomUtils_NuRandomService_service
++			nusimdata::SimulationBase
++			sbncode::EventGenerator_MeVPrtl_Constants
++                        sbnobj::Common_EventGen_MeVPrtl
+ )
+ 
+ simple_plugin( WeightedRayTraceBox tool
+-                            ${ART_FRAMEWORK_CORE}
+-                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-                            ${ART_FRAMEWORK_PRINCIPAL}
+-                            art_Persistency_Common
+-                            art_Utilities canvas
++                            art::Framework_Core
++                            art::Framework_Services_Registry
++                            art_root_io::TFileService_service 
++                            art::Framework_Principal
++                            art::Persistency_Common
++                            art::Utilities canvas::canvas
+                             ${MF_MESSAGELOGGER}
+                             ${MF_UTILITIES}
+-                            ${FHICLCPP}
+-                            cetlib cetlib_except
+-                            ${ROOT_EVE_LIB_LIST}
+-                            ${ROOT_X3d}
+-                            ${ROOT_BASIC_LIB_LIST}
+-			${CLHEP}
+-			larcorealg_Geometry
+-			nurandom_RandomUtils_NuRandomService_service
+-			dk2nuGenie
+-			dk2nuTree
+-			sbncode_EventGenerator_MeVPrtl_Constants
++                            fhiclcpp::fhiclcpp
++                            cetlib::cetlib cetlib_except::cetlib_except
++                            ROOT::Eve
++                            ROOT::X3d
++                            ROOT::Core
++			CLHEP::CLHEP
++			larcorealg::Geometry
++			nurandom::RandomUtils_NuRandomService_service
++			${DK2NUGENIE}
++			${DK2NUTREE}
++			sbncode::EventGenerator_MeVPrtl_Constants
++                        sbnobj::Common_EventGen_MeVPrtl
+ )
+ 
+ simple_plugin( MixedWeightRayTraceBox tool
+-                            ${ART_FRAMEWORK_CORE}
+-                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-                            ${ART_FRAMEWORK_PRINCIPAL}
+-                            art_Persistency_Common
+-                            art_Utilities canvas
++                            art::Framework_Core
++                            art::Framework_Services_Registry
++                            art_root_io::TFileService_service
++                            art::Framework_Principal
++                            art::Persistency_Common
++                            art::Utilities canvas::canvas
+                             ${MF_MESSAGELOGGER}
+                             ${MF_UTILITIES}
+-                            ${FHICLCPP}
+-                            cetlib cetlib_except
+-                            ${ROOT_EVE_LIB_LIST}
+-                            ${ROOT_X3d}
+-                            ${ROOT_BASIC_LIB_LIST}
+-			${CLHEP}
+-			larcorealg_Geometry
+-			nurandom_RandomUtils_NuRandomService_service
++                            fhiclcpp::fhiclcpp
++                            cetlib::cetlib cetlib_except::cetlib_except
++                            ROOT::Eve
++                            ROOT::X3d
++                            ROOT::Core
++			CLHEP::CLHEP
++			larcorealg::Geometry
++			nurandom::RandomUtils_NuRandomService_service
+ 			dk2nuTree
+-			sbncode_EventGenerator_MeVPrtl_Constants
++			sbncode::EventGenerator_MeVPrtl_Constants
++                        sbnobj::Common_EventGen_MeVPrtl
+ )
+ 
+ 
+ 
+ 
+ simple_plugin( ReThrowRayTraceBox tool
+-                            ${ART_FRAMEWORK_CORE}
+-                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-                            ${ART_FRAMEWORK_PRINCIPAL}
+-                            art_Persistency_Common
+-                            art_Utilities canvas
++                            art::Framework_Core
++                            art::Framework_Services_Registry
++                            art_root_io::TFileService_service
++                            art::Framework_Principal
++                            art::Persistency_Common
++                            art::Utilities canvas::canvas
+                             ${MF_MESSAGELOGGER}
+                             ${MF_UTILITIES}
+-                            ${FHICLCPP}
+-                            cetlib cetlib_except
+-                            ${ROOT_EVE_LIB_LIST}
+-                            ${ROOT_X3d}
+-                            ${ROOT_BASIC_LIB_LIST}
+-			${CLHEP}
+-			larcorealg_Geometry
+-			nurandom_RandomUtils_NuRandomService_service
+-			sbncode_EventGenerator_MeVPrtl_Constants
++                            fhiclcpp::fhiclcpp
++                            cetlib::cetlib cetlib_except::cetlib_except
++                            ROOT::Eve
++                            ROOT::X3d
++                            ROOT::Core
++			CLHEP::CLHEP
++			larcorealg::Geometry
++			nurandom::RandomUtils_NuRandomService_service
++			sbncode::EventGenerator_MeVPrtl_Constants
++                        sbnobj::Common_EventGen_MeVPrtl
+ )
+ 
+ simple_plugin( RayTraceBox tool
+-                            ${ART_FRAMEWORK_CORE}
+-                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-                            ${ART_FRAMEWORK_PRINCIPAL}
+-                            art_Persistency_Common
+-                            art_Utilities canvas
++                            art::Framework_Core
++                            art::Framework_Services_Registry
++                            art_root_io::TFileService_service
++                            art::Framework_Principal
++                            art::Persistency_Common
++                            art::Utilities canvas::canvas
+                             ${MF_MESSAGELOGGER}
+                             ${MF_UTILITIES}
+-                            ${FHICLCPP}
+-                            cetlib cetlib_except
+-                            ${ROOT_EVE_LIB_LIST}
+-                            ${ROOT_X3d}
+-                            ${ROOT_BASIC_LIB_LIST}
+-			${CLHEP}
+-			larcorealg_Geometry
+-			nurandom_RandomUtils_NuRandomService_service
+-			sbncode_EventGenerator_MeVPrtl_Constants
++                            fhiclcpp::fhiclcpp
++                            cetlib::cetlib cetlib_except::cetlib_except
++                            ROOT::Eve
++                            ROOT::X3d
++                            ROOT::Core
++			CLHEP::CLHEP
++			larcorealg::Geometry
++			nurandom::RandomUtils_NuRandomService_service
++			sbncode::EventGenerator_MeVPrtl_Constants
++                        sbnobj::Common_EventGen_MeVPrtl
+ )
+ 
+ add_subdirectory(Higgs)
+diff --git a/sbncode/EventGenerator/MeVPrtl/Tools/HNL/CMakeLists.txt b/sbncode/EventGenerator/MeVPrtl/Tools/HNL/CMakeLists.txt
+index 1c2f798..368b4c6 100644
+--- a/sbncode/EventGenerator/MeVPrtl/Tools/HNL/CMakeLists.txt
++++ b/sbncode/EventGenerator/MeVPrtl/Tools/HNL/CMakeLists.txt
+@@ -1,55 +1,58 @@
+-art_make_library( LIBRARY_NAME sbncode_EventGenerator_MeVPrtl_Dalitz
++art_make_library( LIBRARY_NAME sbncode::EventGenerator_MeVPrtl_Dalitz
+           SOURCE HNLDecayDalitz.cpp
+           LIBRARIES
+                         ${ROOT_BASIC_LIB_LIST}
+                         ${ROOT_EVE_LIB_LIST}
+                         ${ROOT_X3d}
+-			sbncode_EventGenerator_MeVPrtl_Constants
++			sbncode::EventGenerator_MeVPrtl_Constants
++                        sbnobj::Common_EventGen_MeVPrtl
+         )
+ 
+ simple_plugin( Kaon2HNLFlux tool
+-                            ${ART_FRAMEWORK_CORE}
+-                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-                            ${ART_FRAMEWORK_PRINCIPAL}
+-                            art_Persistency_Common
+-                            art_Utilities canvas
++                            art::Framework_Core
++                            art::Framework_Services_Registry
++                            art_root_io::TFileService_service 
++                            art::Framework_Principal
++                            art::Persistency_Common
++                            art::Utilities canvas::canvas
+                             ${MF_MESSAGELOGGER}
+                             ${MF_UTILITIES}
+                             ${FHICLCPP}
+-                            cetlib cetlib_except
++                            cetlib::cetlib cetlib_except::cetlib_except
+                             ${ROOT_EVE_LIB_LIST}
+                             ${ROOT_X3d}
+                             ${ROOT_BASIC_LIB_LIST}
+-			EGPythia6
+-			${CLHEP}
+-			sbnobj_Common_EventGen_MeVPrtl
+-			nugen_EventGeneratorBase_GENIE
+-			nurandom_RandomUtils_NuRandomService_service
+-			GSL
+-			sbncode_EventGenerator_MeVPrtl_Constants
++			ROOT::EGPythia6
++			CLHEP::CLHEP
++			sbnobj::Common_EventGen_MeVPrtl
++			nugen::EventGeneratorBase_GENIE
++			nurandom::RandomUtils_NuRandomService_service
++			gsl
++			sbncode::EventGenerator_MeVPrtl_Constants
++                        sbnobj::Common_EventGen_MeVPrtl
+ )
+ 
+ simple_plugin( HNLMakeDecay tool
+-                            ${ART_FRAMEWORK_CORE}
+-                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-                            ${ART_FRAMEWORK_PRINCIPAL}
+-                            art_Persistency_Common
+-                            art_Utilities canvas
++                            art::Framework_Core
++                            art::Framework_Services_Registry
++                            art_root_io::TFileService_service
++                            art::Framework_Principal
++                            art::Persistency_Common
++                            art::Utilities canvas::canvas
+                             ${MF_MESSAGELOGGER}
+                             ${MF_UTILITIES}
+                             ${FHICLCPP}
+-                            cetlib cetlib_except
++                            cetlib::cetlib cetlib_except::cetlib_except
+                             ${ROOT_EVE_LIB_LIST}
+                             ${ROOT_X3d}
+                             ${ROOT_BASIC_LIB_LIST}
+-			${CLHEP}
+-			nurandom_RandomUtils_NuRandomService_service
+-			nusimdata_SimulationBase
+-			GSL
+-			sbncode_EventGenerator_MeVPrtl_Dalitz
+-			sbncode_EventGenerator_MeVPrtl_Constants
++			CLHEP::CLHEP
++			nurandom::RandomUtils_NuRandomService_service
++			nusimdata::SimulationBase
++			${GSL}
++			sbncode::EventGenerator_MeVPrtl_Dalitz
++			sbncode::EventGenerator_MeVPrtl_Constants
++                        sbnobj::Common_EventGen_MeVPrtl
+ )
+ 
+ 
+diff --git a/sbncode/EventGenerator/MeVPrtl/Tools/Higgs/CMakeLists.txt b/sbncode/EventGenerator/MeVPrtl/Tools/Higgs/CMakeLists.txt
+index 97bab07..638b7a1 100644
+--- a/sbncode/EventGenerator/MeVPrtl/Tools/Higgs/CMakeLists.txt
++++ b/sbncode/EventGenerator/MeVPrtl/Tools/Higgs/CMakeLists.txt
+@@ -1,65 +1,68 @@
+ simple_plugin( MonoEnergyHiggsFlux tool
+-                            ${ART_FRAMEWORK_CORE}
+-                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-                            ${ART_FRAMEWORK_PRINCIPAL}
+-                            art_Persistency_Common
+-                            art_Utilities canvas
++                            art::Framework_Core
++                            art::Framework_Services_Registry
++                            art_root_io::TFileService_service 
++                            art::Framework_Principal
++                            art::Persistency_Common
++                            art::Utilities canvas::canvas
+                             ${MF_MESSAGELOGGER}
+                             ${MF_UTILITIES}
+                             ${FHICLCPP}
+-                            cetlib cetlib_except
++                            cetlib::cetlib cetlib_except::cetlib_except
+                             ${ROOT_EVE_LIB_LIST}
+                             ${ROOT_X3d}
+                             ${ROOT_BASIC_LIB_LIST}
+-			${CLHEP}
+-			nugen_EventGeneratorBase_GENIE
+-			nurandom_RandomUtils_NuRandomService_service
+-			sbncode_EventGenerator_MeVPrtl_Constants
++			CLHEP::CLHEP
++			nugen::EventGeneratorBase_GENIE
++			nurandom::RandomUtils_NuRandomService_service
++			sbncode::EventGenerator_MeVPrtl_Constants
++                        sbnobj::Common_EventGen_MeVPrtl
+ )
+ 
+ 
+ simple_plugin( Kaon2HiggsFlux tool
+-                            ${ART_FRAMEWORK_CORE}
+-                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-                            ${ART_FRAMEWORK_PRINCIPAL}
+-                            art_Persistency_Common
+-                            art_Utilities canvas
++                            art::Framework_Core
++                            art::Framework_Services_Registry
++                            art_root_io::TFileService_service
++                            art::Framework_Principal
++                            art::Persistency_Common
++                            art::Utilities canvas::canvas
+                             ${MF_MESSAGELOGGER}
+                             ${MF_UTILITIES}
+                             ${FHICLCPP}
+-                            cetlib cetlib_except
++                            cetlib::cetlib cetlib_except::cetlib_except
+                             ${ROOT_EVE_LIB_LIST}
+                             ${ROOT_X3d}
+                             ${ROOT_BASIC_LIB_LIST}
+ 			EGPythia6
+-			${CLHEP}
+-			sbnobj_Common_EventGen_MeVPrtl
+-			nugen_EventGeneratorBase_GENIE
+-			nurandom_RandomUtils_NuRandomService_service
+-			GSL
+-			sbncode_EventGenerator_MeVPrtl_Constants
++			CLHEP::CLHEP
++			sbnobj::Common_EventGen_MeVPrtl
++			nugen::EventGeneratorBase_GENIE
++			nurandom::RandomUtils_NuRandomService_service
++			${GSL}
++			sbncode::EventGenerator_MeVPrtl_Constants
++                        sbnobj::Common_EventGen_MeVPrtl
+ )
+ 
+ simple_plugin( HiggsMakeDecay tool
+-                            ${ART_FRAMEWORK_CORE}
+-                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-                            ${ART_FRAMEWORK_PRINCIPAL}
+-                            art_Persistency_Common
+-                            art_Utilities canvas
++                            art::Framework_Core
++                            art::Framework_Services_Registry
++                            art_root_io::TFileService_service
++                            art::Framework_Principal
++                            art::Persistency_Common
++                            art::Utilities canvas::canvas
+                             ${MF_MESSAGELOGGER}
+                             ${MF_UTILITIES}
+                             ${FHICLCPP}
+-                            cetlib cetlib_except
++                            cetlib::cetlib cetlib_except::cetlib_except
+                             ${ROOT_EVE_LIB_LIST}
+                             ${ROOT_X3d}
+                             ${ROOT_BASIC_LIB_LIST}
+-			${CLHEP}
+-			nurandom_RandomUtils_NuRandomService_service
+-			nusimdata_SimulationBase
+-			sbncode_EventGenerator_MeVPrtl_Constants
++			CLHEP::CLHEP
++			nurandom::RandomUtils_NuRandomService_service
++			nusimdata::SimulationBase
++			sbncode::EventGenerator_MeVPrtl_Constants
++                        sbnobj::Common_EventGen_MeVPrtl
+ )
+ 
+ install_headers()
+diff --git a/sbncode/EventGenerator/MeVPrtl/Tools/NuMiKaonGen_tool.cc b/sbncode/EventGenerator/MeVPrtl/Tools/NuMiKaonGen_tool.cc
+index 1ba2882..4d9633b 100644
+--- a/sbncode/EventGenerator/MeVPrtl/Tools/NuMiKaonGen_tool.cc
++++ b/sbncode/EventGenerator/MeVPrtl/Tools/NuMiKaonGen_tool.cc
+@@ -13,7 +13,7 @@
+ #include "fhiclcpp/ParameterSet.h"
+ #include "messagefacility/MessageLogger/MessageLogger.h"
+ #include "CLHEP/Random/RandFlat.h"
+-#include "IFDH_service.h"
++#include "ifdh_art/IFDHService/IFDH_service.h"
+ 
+ #include "nusimdata/SimulationBase/MCFlux.h"
+ 
+diff --git a/sbncode/EventGenerator/MultiPart/CMakeLists.txt b/sbncode/EventGenerator/MultiPart/CMakeLists.txt
+index a15df99..dd7226a 100644
+--- a/sbncode/EventGenerator/MultiPart/CMakeLists.txt
++++ b/sbncode/EventGenerator/MultiPart/CMakeLists.txt
+@@ -1,40 +1,40 @@
+ # Add the subfolder containing the deconvolution tools
+-art_make( 
+-          MODULE_LIBRARIES larcorealg_Geometry
+-            larcore_Geometry_Geometry_service
+-            lardata_Utilities
+-            larevt_Filters
+-            lardataobj_RawData
+-            larevt_CalibrationDBI_IOVData
+-            larevt_CalibrationDBI_Providers
+-            lardataobj_RecoBase
+-            lardata_ArtDataHelper
+-            larsim_Simulation nug4_ParticleNavigation 
+-            lardataobj_Simulation
+-            nusimdata_SimulationBase
+-            lardata_Utilities
+-            lardataobj_MCBase
+-            larcoreobj_SummaryData
+-            nusimdata_SimulationBase
+-            nurandom_RandomUtils_NuRandomService_service
+-            lardataobj_MCBase
+-            ${CLHEP}
+-            ${ART_FRAMEWORK_CORE}
+-            ${ART_FRAMEWORK_PRINCIPAL}
+-            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-            ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
+-            ${ART_ROOT_IO_TFILESERVICE_SERVICE}
+-            art_Persistency_Common
+-            art_Persistency_Provenance
+-            art_Utilities
+-            canvas
++art_make(  ### MIGRATE-ACTION-RECOMMENDED: use art_make_library(), art_dictionary(), simple_plugin() with explicit source lists
++          MODULE_LIBRARIES larcorealg::Geometry
++            larcore::Geometry_Geometry_service
++            lardata::Utilities
++            larevt::Filters
++            lardataobj::RawData
++            larevt::CalibrationDBI_IOVData
++            larevt::CalibrationDBI_Providers
++            lardataobj::RecoBase
++            lardata::ArtDataHelper
++            larsim::Simulation nug4::ParticleNavigation 
++            lardataobj::Simulation
++            nusimdata::SimulationBase
++            lardata::Utilities
++            lardataobj::MCBase
++            larcoreobj::SummaryData
++            nusimdata::SimulationBase
++            nurandom::RandomUtils_NuRandomService_service
++            lardataobj::MCBase
++            CLHEP::CLHEP
++            art::Framework_Core
++            art::Framework_Principal
++            art::Framework_Services_Registry
++            art_root_io::tfile_support ${ROOT_CORE}
++            art_root_io::TFileService_service
++            art::Persistency_Common
++            art::Persistency_Provenance
++            art::Utilities
++            canvas::canvas
+             ${MF_MESSAGELOGGER}
+             ${MF_UTILITIES}
+             ${FHICLCPP}
+             ${CETLIB}
+             ${ROOT_FFTW}
+             ${ROOT_BASIC_LIB_LIST}
+-	    ${ROOT_EG}
++	    ROOT::EG
+         )
+ 
+ install_headers()
+diff --git a/sbncode/FlashMatch/CMakeLists.txt b/sbncode/FlashMatch/CMakeLists.txt
+index ddb1522..f1d4127 100644
+--- a/sbncode/FlashMatch/CMakeLists.txt
++++ b/sbncode/FlashMatch/CMakeLists.txt
+@@ -4,35 +4,36 @@
+ #  EXTRA_FLAGS  -Wall -Wextra  -pedantic  #-Wconversion
+ #  )
+ 
+-art_make(
++art_make( ### MIGRATE-ACTION-RECOMMENDED: use art_make_library(), art_dictionary(), simple_plugin() with explicit source lists
+   MODULE_LIBRARIES
+-  ${ART_FRAMEWORK_CORE}
+-  ${ART_FRAMEWORK_PRINCIPAL}
+-  ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-  ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
+-  ${ART_ROOT_IO_TFILESERVICE_SERVICE}
+-  art_Persistency_Common
+-  art_Persistency_Provenance
+-  art_Utilities canvas
+-
+-  canvas
+-  cetlib
+-  cetlib_except
+-
+-  larcore_Geometry_Geometry_service
+-  larcorealg_Geometry
+-
+-  lardata_DetectorInfoServices_DetectorClocksServiceStandard_service
+-  lardata_Utilities
+-  lardataobj_AnalysisBase
+-  lardataobj_RawData
+-  lardataobj_RecoBase
+-  lardataobj_Simulation
+-
+-  larpandora_LArPandoraInterface
+-  larsim_Utils
+-
+-  nusimdata_SimulationBase
++  art::Framework_Core
++  art::Framework_Principal
++  art::Framework_Services_Registry
++  art_root_io::tfile_support ${ROOT_CORE}
++  art_root_io::TFileService_service
++  art::Persistency_Common
++  art::Persistency_Provenance
++  art::Utilities canvas::canvas
++
++  canvas::canvas
++  cetlib::cetlib
++  cetlib_except::cetlib_except
++
++  larcore::Geometry_Geometry_service
++  larcorealg::Geometry
++
++  lardata::DetectorInfoServices_DetectorClocksServiceStandard_service
++  lardata::Utilities
++  lardataalg::DetectorInfo
++  lardataobj::AnalysisBase
++  lardataobj::RawData
++  lardataobj::RecoBase
++  lardataobj::Simulation
++
++  larpandora::LArPandoraInterface
++  larsim::Utils
++  sbnobj::Common_Reco
++  nusimdata::SimulationBase
+   ${MF_MESSAGELOGGER}
+   ${FHICLCPP}
+   ${ROOT_GEOM}
+diff --git a/sbncode/FluxReader/CMakeLists.txt b/sbncode/FluxReader/CMakeLists.txt
+index 7e11652..02e6297 100644
+--- a/sbncode/FluxReader/CMakeLists.txt
++++ b/sbncode/FluxReader/CMakeLists.txt
+@@ -1,94 +1,103 @@
+ cet_enable_asserts()
+-include_directories ( $ENV{GENIE_INC}/GENIE )
+-include_directories ( $ENV{DK2NUDATA_INC} )
+-include_directories ( $ENV{DK2NUGENIE_INC} )
+-link_directories( $ENV{DK2NUDATA_LIB})
++include_directories ( $ENV{GENIE}/include/GENIE ) ### MIGRATE-ACTION-RECOMMENDED: use target_link_directories() with target semantics
++include_directories ( $ENV{GENIE}/include ) ### MIGRATE-ACTION-RECOMMENDED: use target_link_directories() with target semantics
++include_directories ( $ENV{DK2NUDATA_INC} ) ### MIGRATE-ACTION-RECOMMENDED: use target_link_directories() with target semantics
++include_directories ( $ENV{DK2NUGENIE_INC} ) ### MIGRATE-ACTION-RECOMMENDED: use target_link_directories() with target semantics
++link_directories( $ENV{DK2NUDATA_LIB}) ### MIGRATE-ACTION-RECOMMENDED: use target_link_libraries() with target semantics
+ 
+ file(GLOB INTERFACEFILES *Interface* )
+ 
+ simple_plugin( FluxReader
+                "source"
+-               sbncode_FluxReader
++               sbncode::FluxReader
++               larcore::Geometry_Geometry_service 
++               nutools::EventGeneratorBase_CRY
++               lardata::Utilities
+                ${ART_FRAMEWORK_PERSISTENCY_COMMON}
+ )
+ 
+ simple_plugin ( FluxGeoFilter "module"
+-                ${ART_FRAMEWORK_CORE}
+-                ${ART_FRAMEWORK_PRINCIPAL}
+-                ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+-                ${ART_ROOT_IO_TFILESERVICE_SERVICE}
+-                ${ART_ROOT_IO_TFILE_SUPPORT}
+-                art_Persistency_Common canvas
+-                art_Persistency_Provenance canvas
+-                art_Utilities canvas
++                art::Framework_Core
++                art::Framework_Principal
++                art::Framework_Services_Registry
++                art_root_io::TFileService_service
++                art_root_io::tfile_support
++                art::Persistency_Common canvas::canvas
++                art::Persistency_Provenance canvas::canvas
++                art::Utilities canvas::canvas
+                 ${MF_MESSAGELOGGER}
+-                nusimdata_SimulationBase
+-                larcore_Geometry_Geometry_service
+-                larcorealg_Geometry
+-                ${ROOT_GEOM}
++                nusimdata::SimulationBase
++                larcore::Geometry_Geometry_service
++               lardata::Utilities
++                larcorealg::Geometry
++                ROOT::Geom
+                 ${ROOT_BASIC_LIB_LIST}
+ )
+ 
+-art_make_library( LIBRARY_NAME sbncode_FluxReader_FluxInterface
++art_make_library( LIBRARY_NAME sbncode::FluxReader_FluxInterface
+                   SOURCE	${INTERFACEFILES}
+                   LIBRARIES
+-                  nusimdata_SimulationBase
++                  nusimdata::SimulationBase
++               larcore::Geometry_Geometry_service 
+                   # GENIE STUFF #####################################
+                   xml2
+                   LOG4CPP
+-                  GFwEG
+-                  GFwAlg
+-                  GFwMsg
+-                  GFwGHEP
+-                  GTlFlx
+-                  dk2nuTree
++                  GENIE::GFwEG
++                  GENIE::GFwAlg
++                  GENIE::GFwMsg
++                  GENIE::GFwGHEP
++                  GENIE::GTlFlx
++                  dk2nu::Tree
+                   #${DK2NUDATA}
+                   ${DK2NUGENIE}
+                   ####################################################
+-                  cetlib cetlib_except
++                  cetlib::cetlib cetlib_except::cetlib_except
++               lardata::Utilities
+ 
+                   ${FHICLCPP}
+                   ${MF_MESSAGELOGGER}
+-                  ${CLHEP}
+-                  ${ROOT_BASIC_LIB_LIST}
++                  CLHEP::CLHEP
++                  ROOT::Core ROOT::Tree
+                   ${Boost_SYSTEM_LIBRARY}
+ )
+ 
+-art_make( EXCLUDE FluxReader_source.cc ${INTERFACEFILES} FluxGeoFilter_module.cc
+-          LIB_LIBRARIES	nusimdata_SimulationBase
+-                        sbncode_FluxReader_FluxInterface
+-                        larcoreobj_SummaryData
+-                        ${ART_FRAMEWORK_CORE}
+-                        ${ART_FRAMEWORK_IO_SOURCES}
+-                        ${ART_FRAMEWORK_PRINCIPAL}
+-                        ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                        ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+-                        ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+-                        ${ART_ROOT_IO_TFILESERVICE_SERVICE}
+-                        ${ART_ROOT_IO_TFILE_SUPPORT}
+-                        art_Persistency_Common canvas
+-                        art_Persistency_Provenance canvas
+-                        art_Utilities canvas
++art_make( EXCLUDE FluxReader_source.cc ${INTERFACEFILES} FluxGeoFilter_module.cc ### MIGRATE-ACTION-RECOMMENDED: use art_make_library(), art_dictionary(), simple_plugin() with explicit source lists
++          LIB_LIBRARIES	nusimdata::SimulationBase
++                        sbncode::FluxReader_FluxInterface
++                        larcoreobj::SummaryData
++               larcore::Geometry_Geometry_service 
++                        art::Framework_Core
++                        art::Framework_IO_Sources
++                        art::Framework_Principal
++                        art::Framework_Services_Registry
++                        art_root_io::TFileService_service
++                        art_root_io::TFileService_service
++                        art_root_io::tfile_support
++                        art::Persistency_Common canvas::canvas
++                        art::Persistency_Provenance canvas::canvas
++                        art::Utilities canvas::canvas
+                         ${MF_MESSAGELOGGER}
+                         ${MF_UTILITIES}
+                         ${FHICLCPP}
+                         ${Boost_SYSTEM_LIBRARY}
+-                        ${ROOT_BASIC_LIB_LIST}
+-                        cetlib cetlib_except
++                        ROOT::Core ROOT::Tree
++                        cetlib::cetlib cetlib_except::cetlib_except
++               nutools::EventGeneratorBase_CRY
++               lardata::Utilities
+ 
+-          MODULE_LIBRARIES sbncode_FluxReader
+-                        sbncode_FluxReader_FluxInterface
+-                        nusimdata_SimulationBase
+-                        larcoreobj_SummaryData
+-                        ${ART_FRAMEWORK_CORE}
+-                        ${ART_FRAMEWORK_IO_SOURCES}
+-                        ${ART_FRAMEWORK_PRINCIPAL}
+-                        ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                        ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+-                        ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+-                        ${ART_ROOT_IO_TFILESERVICE_SERVICE}
+-                        ${ART_ROOT_IO_TFILE_SUPPORT}
++          MODULE_LIBRARIES sbncode::FluxReader
++                        sbncode::FluxReader_FluxInterface
++                        nusimdata::SimulationBase
++                        larcoreobj::SummaryData
++               larcore::Geometry_Geometry_service 
++               lardata::Utilities
++                        art::Framework_Core
++                        art::Framework_IO_Sources
++                        art::Framework_Principal
++                        art::Framework_Services_Registry
++                        art_root_io::TFileService_service
++                        art_root_io::TFileService_service
++                        art_root_io::tfile_support
+                         # GENIE STUFF #####################################
+                         xml2
+                         LOG4CPP
+@@ -107,7 +116,7 @@ art_make( EXCLUDE FluxReader_source.cc ${INTERFACEFILES} FluxGeoFilter_module.cc
+                         ${MF_UTILITIES}
+                         ${FHICLCPP}
+                         ${Boost_SYSTEM_LIBRARY}
+-                        ${ROOT_BASIC_LIB_LIST}
++                        ROOT::Core ROOT::Tree
+ )
+ 
+ install_headers()
+diff --git a/sbncode/GeometryTools/CMakeLists.txt b/sbncode/GeometryTools/CMakeLists.txt
+index 9e162ab..cc8796a 100644
+--- a/sbncode/GeometryTools/CMakeLists.txt
++++ b/sbncode/GeometryTools/CMakeLists.txt
+@@ -1,25 +1,25 @@
+ art_make(    LIBRARY_NAME sbncode_GeoWrappers
+-             LIB_LIBRARIES larcorealg_Geometry
+-                           larcore_Geometry_Geometry_service
+-                           larsim_Simulation lardataobj_Simulation
+-                           larsim_MCCheater_BackTrackerService_service
+-                           larsim_MCCheater_ParticleInventoryService_service
+-                           lardata_Utilities
+-                           larevt_Filters
+-                           lardataobj_RawData
+-                           lardataobj_RecoBase
+-                           lardata_RecoObjects  
+-                           larpandora_LArPandoraInterface
+-                           nusimdata_SimulationBase
+-                           cetlib cetlib_except
++             LIB_LIBRARIES larcorealg::Geometry
++                           larcore::Geometry_Geometry_service
++                           larsim::Simulation lardataobj::Simulation
++                           larsim::MCCheater_BackTrackerService_service
++                           larsim::MCCheater_ParticleInventoryService_service
++                           lardata::Utilities
++                           larevt::Filters
++                           lardataobj::RawData
++                           lardataobj::RecoBase
++                           lardata::RecoObjects  
++                           larpandora::LArPandoraInterface
++                           nusimdata::SimulationBase
++                           cetlib::cetlib cetlib_except::cetlib_except
+                            ${ART_FRAMEWORK_CORE}
+                            ${ART_FRAMEWORK_PRINCIPAL}
+                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+                            ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
+                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}
+-                           art_Persistency_Common canvas
+-                           art_Persistency_Provenance canvas
+-                           art_Utilities canvas
++                           art::Persistency_Common canvas::canvas
++                           art::Persistency_Provenance
++                           art::Utilities
+                            ${MF_MESSAGELOGGER}
+                            
+                            ${FHICLCPP}
+diff --git a/sbncode/LArRecoProducer/CMakeLists.txt b/sbncode/LArRecoProducer/CMakeLists.txt
+index 381d166..2159422 100644
+--- a/sbncode/LArRecoProducer/CMakeLists.txt
++++ b/sbncode/LArRecoProducer/CMakeLists.txt
+@@ -1,35 +1,38 @@
+-#link_directories(
++#link_directories( ### MIGRATE-ACTION-RECOMMENDED: use target_link_libraries() with target semantics
+ # $ENV{ROOTSYS}/lib
+ #)
+ 
+ add_subdirectory(LArReco)
+-art_make( LIB_LIBRARIES
++art_make( 
++  LIB_LIBRARIES
+ 		fhiclcpp::fhiclcpp
+ 		art::Persistency_Provenance canvas
+ 		${ROOT_BASIC_LIB_LIST}
+ 		sbncode_GeoWrappers
+ 
+-	  MODULE_LIBRARIES
+-		art::Framework_Core
+-		art::Framework_Services_Registry
+-		art_root_io::TFileService_service
+-		${ART_FRAMEWORK_SERVICES}
+-		art::Utilities canvas::canvas
+-		art::Framework_Principal
+-		art::Persistency_Common
+-		messagefacility::MF_MessageLogger
+-		cetlib::cetlib cetlib_except
+-		${ROOT_EVE_LIB_LIST}
+-		${ROOT_X3d}
+-		${ROOT_BASIC_LIB_LIST}
+-		messagefacility::MF_MessageLogger
+-		sbn_LArReco	    
+-		sbncode_LArRecoProducer
+-		sbnobj_Common_CRT
+- 		sbnobj_Common_Reco
+-		lardataobj_RecoBase_AssnsDicts_dict
+-		lardataobj_RecoBase_dict	
+-		lardataobj_RecoBase
++  MODULE_LIBRARIES
++	art::Framework_Core
++	art::Framework_Services_Registry
++	art_root_io::TFileService_service 
++	art::Framework_Principal
++	art::Persistency_Common
++	art::Utilities canvas::canvas
++	${MF_MESSAGELOGGER}
++	${MF_UTILITIES}
++	${FHICLCPP}
++	cetlib::cetlib cetlib_except::cetlib_except
++	${ROOT_EVE_LIB_LIST}
++	ROOT::X3d
++	ROOT::Core
++	messagefacility::MF_MessageLogger
++        ROOT::EG
++	sbn_LArReco	    
++        sbncode_LArRecoProducer
++	sbnobj::Common_CRT
++	sbnobj::Common_Reco
++	lardataobj::RecoBase_AssnsDicts_dict
++	lardataobj::RecoBase_dict	
++	lardataobj::RecoBase
+ )
+ 
+ install_headers()
+diff --git a/sbncode/LArRecoProducer/LArReco/CMakeLists.txt b/sbncode/LArRecoProducer/LArReco/CMakeLists.txt
+index 0395da4..8a416cf 100644
+--- a/sbncode/LArRecoProducer/LArReco/CMakeLists.txt
++++ b/sbncode/LArRecoProducer/LArReco/CMakeLists.txt
+@@ -2,18 +2,18 @@
+ art_make_library( LIBRARY_NAME sbn_LArReco
+   SOURCE  TrackMomentumCalculator.cxx TrajectoryMCSFitter.cxx
+                   LIBRARIES
+-        ${ART_FRAMEWORK_CORE}
+-        ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-        ${ART_FRAMEWORK_SERVICES}
+-        ${ART_FRAMEWORK_PRINCIPAL}
+-        art_Persistency_Common
+-        art_Utilities canvas
++        art::Framework_Core
++        art::Framework_Services_Registry
++        art::Framework_Principal
++        art::Persistency_Common
++        art::Utilities canvas::canvas
+                     ${ROOT_BASIC_LIB_LIST}
+         ${MF_MESSAGELOGGER}
+         ${MF_UTILITIES}
+         ${FHICLCPP}
+-                    cetlib cetlib_except
+-        lardataobj_RecoBase
+-        ${ROOT_MINUIT}
+-        ${ROOT_MINUIT2}
++                    cetlib::cetlib cetlib_except::cetlib_except
++        lardataobj::RecoBase larcorealg::CoreUtils lardata::RecoObjects
++        ROOT::Minuit
++        ROOT::Minuit2
++        ROOT::Graf3d
+                 )
+diff --git a/sbncode/Metadata/CMakeLists.txt b/sbncode/Metadata/CMakeLists.txt
+index 0cfa462..8948112 100644
+--- a/sbncode/Metadata/CMakeLists.txt
++++ b/sbncode/Metadata/CMakeLists.txt
+@@ -1,15 +1,15 @@
+ cet_enable_asserts()
+ 
+-set( sbn_meta_lib_list   ${ART_FRAMEWORK_CORE}
+-                         ${ART_FRAMEWORK_PRINCIPAL}
+-                         ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                         ${ART_FRAMEWORK_SERVICES_BASIC}
++set( sbn_meta_lib_list   art::Framework_Core
++                         art::Framework_Principal
++                         art::Framework_Services_Registry
+                          ${ART_FRAMEWORK_SERVICES_SYSTEM_FILECATALOGMETADATA_SERVICE}
+-                         art_Framework_Services_System_TriggerNamesService_service
+-			 art_Persistency_Common canvas
+-			 art_Persistency_Provenance canvas
++                         art::Framework_Services_System_TriggerNamesService_service
++			 art::Persistency_Common canvas::canvas
++			 art::Persistency_Provenance canvas::canvas
+                          ${MF_MESSAGELOGGER}
+-                         ${ROOT_BASIC_LIB_LIST}
++                         ROOT::Core
++                         larcoreobj::SummaryData
+     )
+ 
+ simple_plugin( FileCatalogMetadataSBN  "service"
+@@ -18,8 +18,8 @@ simple_plugin( FileCatalogMetadataSBN  "service"
+ 
+ simple_plugin( MetadataSBN "service"
+                ${sbn_meta_lib_list}
+-               art_Framework_IO
+-               art_Framework_IO_detail
++               art::Framework_IO
++               art::Framework_IO_detail
+         )
+ 
+ install_headers()
+diff --git a/sbncode/NuMuSelection/CMakeLists.txt b/sbncode/NuMuSelection/CMakeLists.txt
+index 02bfebb..f1f69d9 100644
+--- a/sbncode/NuMuSelection/CMakeLists.txt
++++ b/sbncode/NuMuSelection/CMakeLists.txt
+@@ -1,86 +1,95 @@
+ simple_plugin( MuPVertexStudy module
+-                            ${ART_FRAMEWORK_CORE}
+-                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-                            ${ART_FRAMEWORK_PRINCIPAL}
+-                            art_Persistency_Common
+-                            art_Utilities canvas
++                            art::Framework_Core
++                            art::Framework_Services_Registry
++                            art_root_io::TFileService_service
++                            art::Framework_Principal
++                            art::Persistency_Common
++                            art::Utilities canvas::canvas
+                             ${MF_MESSAGELOGGER}
+                             ${MF_UTILITIES}
+                             ${FHICLCPP}
+-                            cetlib cetlib_except
++                            cetlib::cetlib cetlib_except::cetlib_except
+                             ${ROOT_EVE_LIB_LIST}
+                             ${ROOT_X3d}
+                             ${ROOT_BASIC_LIB_LIST}
+-	art_root_io_tfile_support
+-	art_root_io
+-	art_root_io_dict
++	art_root_io::tfile_support
++	art_root_io::art_root_io
++	art_root_io::dict
+         caf_RecoUtils
+-        lardataobj_AnalysisBase
+-        lardataobj_RecoBase
+-        larcorealg_Geometry
+-        larcore_Geometry_Geometry_service
+-        larcorealg_GeoAlgo
+-        larsim_MCCheater_BackTrackerService_service
+-        nusimdata_SimulationBase
+-        larsim_MCCheater_ParticleInventoryService_service
+-	larcorealg_GeoAlgo
++        lardataobj::AnalysisBase
++        lardataobj::RecoBase
++        larcorealg::Geometry
++        larcore::Geometry_Geometry_service
++        larcorealg::GeoAlgo
++        lardataalg::DetectorInfo
++        lardata::DetectorInfoServices_DetectorClocksServiceStandard_service
++        larsim::MCCheater_BackTrackerService_service
++        nusimdata::SimulationBase
++        larsim::MCCheater_ParticleInventoryService_service
++	larcorealg::GeoAlgo
++        larreco::RecoAlg
+ )
+ simple_plugin( MuonS2NStudy module
+-                            ${ART_FRAMEWORK_CORE}
+-                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-                            ${ART_FRAMEWORK_PRINCIPAL}
+-                            art_Persistency_Common
+-                            art_Utilities canvas
++                            art::Framework_Core
++                            art::Framework_Services_Registry
++                            art_root_io::TFileService_service
++                            art::Framework_Principal
++                            art::Persistency_Common
++                            art::Utilities canvas::canvas
+                             ${MF_MESSAGELOGGER}
+                             ${MF_UTILITIES}
+                             ${FHICLCPP}
+-                            cetlib cetlib_except
++                            cetlib::cetlib cetlib_except::cetlib_except
+                             ${ROOT_EVE_LIB_LIST}
+                             ${ROOT_X3d}
+                             ${ROOT_BASIC_LIB_LIST}
+-	art_root_io_tfile_support
+-	art_root_io
+-	art_root_io_dict
++	art_root_io::tfile_support
++	art_root_io::art_root_io
++	art_root_io::dict
+         caf_RecoUtils
+-        lardataobj_AnalysisBase
+-        lardataobj_RecoBase
+-        larcorealg_Geometry
+-        larcore_Geometry_Geometry_service
+-        larcorealg_GeoAlgo
+-        larsim_MCCheater_BackTrackerService_service
+-        nusimdata_SimulationBase
+-        larsim_MCCheater_ParticleInventoryService_service
+-	larcorealg_GeoAlgo
++        lardataobj::AnalysisBase
++        lardataobj::RecoBase
++        larcorealg::Geometry
++        larcore::Geometry_Geometry_service
++        larcorealg::GeoAlgo
++        lardataalg::DetectorInfo
++        lardata::DetectorInfoServices_DetectorClocksServiceStandard_service
++        larsim::MCCheater_BackTrackerService_service
++        nusimdata::SimulationBase
++        larsim::MCCheater_ParticleInventoryService_service
++	larcorealg::GeoAlgo
++        larreco::RecoAlg
+ )
+ simple_plugin( NuMuEfficiencyStudy module
+-                            ${ART_FRAMEWORK_CORE}
+-                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-                            ${ART_FRAMEWORK_PRINCIPAL}
+-                            art_Persistency_Common
+-                            art_Utilities canvas
++                            art::Framework_Core
++                            art::Framework_Services_Registry
++                            art_root_io::TFileService_service
++                            art::Framework_Principal
++                            art::Persistency_Common
++                            art::Utilities canvas::canvas
+                             ${MF_MESSAGELOGGER}
+                             ${MF_UTILITIES}
+                             ${FHICLCPP}
+-                            cetlib cetlib_except
++                            cetlib::cetlib cetlib_except::cetlib_except
+                             ${ROOT_EVE_LIB_LIST}
+                             ${ROOT_X3d}
+                             ${ROOT_BASIC_LIB_LIST}
+-	art_root_io_tfile_support
+-	art_root_io
+-	art_root_io_dict
++	art_root_io::tfile_support
++	art_root_io::art_root_io
++	art_root_io::dict
+         caf_RecoUtils
+-        lardataobj_AnalysisBase
+-        lardataobj_RecoBase
+-        larcorealg_Geometry
+-        larcore_Geometry_Geometry_service
+-        larcorealg_GeoAlgo
+-        larsim_MCCheater_BackTrackerService_service
+-        nusimdata_SimulationBase
+-        larsim_MCCheater_ParticleInventoryService_service
+-	larcorealg_GeoAlgo
++        lardataobj::AnalysisBase
++        lardataobj::RecoBase
++        larcorealg::Geometry
++        larcore::Geometry_Geometry_service
++        larcorealg::GeoAlgo
++        lardataalg::DetectorInfo
++        lardata::DetectorInfoServices_DetectorClocksServiceStandard_service
++        larsim::MCCheater_BackTrackerService_service
++        nusimdata::SimulationBase
++        larsim::MCCheater_ParticleInventoryService_service
++	larcorealg::GeoAlgo
++        larreco::RecoAlg
+ )
+ 
+ install_headers()
+diff --git a/sbncode/OpDet/CMakeLists.txt b/sbncode/OpDet/CMakeLists.txt
+index 3a27da6..4119140 100644
+--- a/sbncode/OpDet/CMakeLists.txt
++++ b/sbncode/OpDet/CMakeLists.txt
+@@ -1,7 +1,7 @@
+ cet_enable_asserts()
+ 
+-art_make(   TOOL_LIBRARIES
+-	    art_Utilities
++art_make(   TOOL_LIBRARIES ### MIGRATE-ACTION-RECOMMENDED: use art_make_library(), art_dictionary(), simple_plugin() with explicit source lists
++	    art::Utilities
+ 	    ${FHICLCPP}
+ 	    ${CETLIB}
+ )
+diff --git a/sbncode/OpT0Finder/CMakeLists.txt b/sbncode/OpT0Finder/CMakeLists.txt
+index 3837439..1e3828e 100644
+--- a/sbncode/OpT0Finder/CMakeLists.txt
++++ b/sbncode/OpT0Finder/CMakeLists.txt
+@@ -1,5 +1,5 @@
+ # Add Geant4 directories as needed by flashmatch code
+-include_directories($ENV{GEANT4_FQ_DIR}/include)
++include_directories($ENV{GEANT4_FQ_DIR}/include) ### MIGRATE-ACTION-RECOMMENDED: use target_link_directories() with target semantics
+ 
+ add_subdirectory(Products)
+ add_subdirectory(flashmatch)
+diff --git a/sbncode/OpT0Finder/Products/CMakeLists.txt b/sbncode/OpT0Finder/Products/CMakeLists.txt
+index 1650113..66cccf9 100644
+--- a/sbncode/OpT0Finder/Products/CMakeLists.txt
++++ b/sbncode/OpT0Finder/Products/CMakeLists.txt
+@@ -1,11 +1,18 @@
+ # for classes_def.xml!!
+-include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
+-# include_directories( $ENV{NUTOOLS_INC} )
++include_directories( ${CMAKE_CURRENT_SOURCE_DIR} ) ### MIGRATE-ACTION-RECOMMENDED: use target_link_directories() with target semantics
++# include_directories( $ENV{NUTOOLS_INC} ) ### MIGRATE-ACTION-RECOMMENDED: use target_link_directories() with target semantics
++get_target_property(DICT_INC_DIR lardataobj::RecoBase INTERFACE_INCLUDE_DIRECTORIES)
++include_directories( ${DICT_INC_DIR} )
++get_target_property(DICT_INC_DIR larcorealg::Geometry INTERFACE_INCLUDE_DIRECTORIES)
++include_directories( ${DICT_INC_DIR} )
++get_target_property(DICT_INC_DIR larcoreobj::SimpleTypesAndConstants INTERFACE_INCLUDE_DIRECTORIES)
++include_directories( ${DICT_INC_DIR} )
+ 
+-art_make(
++art_make( ### MIGRATE-ACTION-RECOMMENDED: use art_make_library(), art_dictionary(), simple_plugin() with explicit source lists
+     LIB_LIBRARIES
+-        ${ROOT_BASIC_LIB_LIST}
+-        ${ROOT_EG}
++        lardataobj::RecoBase
++        ROOT::Core
++        ROOT::Eg
+ )
+ 
+ install_headers()
+diff --git a/sbncode/OpT0Finder/flashmatch/Algorithms/CMakeLists.txt b/sbncode/OpT0Finder/flashmatch/Algorithms/CMakeLists.txt
+index cb26149..786d008 100644
+--- a/sbncode/OpT0Finder/flashmatch/Algorithms/CMakeLists.txt
++++ b/sbncode/OpT0Finder/flashmatch/Algorithms/CMakeLists.txt
+@@ -1,21 +1,20 @@
+-set( ROOTLIB -L$ENV{ROOTSYS}/lib -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMinuit -pthread -lm -ldl)
++set( ROOTLIB -L$ENV{ROOTSYS}/lib -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMinuit -pthread -lm -ldl) ### MIGRATE-ACTION-RECOMMENDED: use of $ENV{... may be UPS-dependent
+ 
+-link_libraries( ${LIB_NAME} -L$ENV{BOOST_LIB} -lboost_system ${ROOTLIB} )
++link_libraries( ${LIB_NAME} -L$ENV{BOOST_LIB} -lboost_system ${ROOTLIB} ) ### MIGRATE-ACTION-RECOMMENDED: use target_link_libraries() with target semantics ### MIGRATE-ACTION-RECOMMENDED: use of $ENV{... may be UPS-dependent
+ 
+-art_make(
++art_make( ### MIGRATE-ACTION-RECOMMENDED: use art_make_library(), art_dictionary(), simple_plugin() with explicit source lists
+     LIB_LIBRARIES
+-        larsim_PhotonPropagation
+-        larsim_PhotonPropagation_PhotonVisibilityService_service
+-        larsim_LegacyLArG4
+-        larcorealg_GeoAlgo
+-        # sbncode_OpT0Finder_flashmatch_GeoAlgo
+-        sbncode_OpT0Finder_flashmatch_Base
+-        ${ART_FRAMEWORK_CORE}
+-        ${ART_FRAMEWORK_PRINCIPAL}
++        larsim::PhotonPropagation
++        larsim::PhotonPropagation_PhotonVisibilityService_service
++        larsim::LegacyLArG4
++        #sbncode::OpT0Finder_flashmatch_GeoAlgo
++        sbncode::OpT0Finder_flashmatch_Base
++        larcorealg::GeoAlgo
++        art::Framework_Core
++        art::Framework_Principal
+         ${ART_FRAMEWORK_BASIC}
+-        ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-        ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+-        ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
++        art::Framework_Services_Registry
++        art_root_io::TFileService_service
+         ${ART_PERSISTENCY_COMMON}
+         ${ART_PERSISTENCY_PROVENANCE}
+         ${ART_UTILITIES}
+diff --git a/sbncode/OpT0Finder/flashmatch/Base/CMakeLists.txt b/sbncode/OpT0Finder/flashmatch/Base/CMakeLists.txt
+index 21a2363..28fcada 100644
+--- a/sbncode/OpT0Finder/flashmatch/Base/CMakeLists.txt
++++ b/sbncode/OpT0Finder/flashmatch/Base/CMakeLists.txt
+@@ -1,37 +1,32 @@
+-set( ROOTLIB -L$ENV{ROOTSYS}/lib -lCore  -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -pthread -lm -ldl)
+-link_libraries( ${LIB_NAME} -L$ENV{BOOST_LIB} ${ROOTLIB} )
+-art_make(
++set( ROOTLIB ROOT::Core  ROOT::RIO ROOT::Net ROOT::Hist ROOT::Graf ROOT::Graf3d ROOT::Gpad ROOT::Tree ROOT::Rint ROOT::Postscript ROOT::Matrix ROOT::Physics ROOT::MathCore ROOT::Thread ) ### MIGRATE-ACTION-RECOMMENDED: use of $ENV{... may be UPS-dependent
++art_make( ### MIGRATE-ACTION-RECOMMENDED: use art_make_library(), art_dictionary(), simple_plugin() with explicit source lists
+     LIB_LIBRARIES
+-        larcorealg_GeoAlgo
+-        # sbncode_OpT0Finder_flashmatch_GeoAlgo
+-        larcorealg_Geometry
+-        larcore_Geometry_Geometry_service
+-        lardataalg_DetectorInfo
+-        art_Framework_Core
+-        art_Framework_Services_Registry
+-        art_Framework_Principal
+-        art_Persistency_Provenance
+-        art_Utilities
+-        canvas
+-        art_Utilities canvas
+-        ${ART_FRAMEWORK_CORE}
+-        ${ART_FRAMEWORK_IO_SOURCES}
+-        ${ART_FRAMEWORK_PRINCIPAL}
+-        ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-        ${ART_ROOT_IO_TFILE_SUPPORT} ${ROOT_CORE}
+-        ${ART_ROOT_IO_TFILESERVICE_SERVICE}
++        #sbncode::OpT0Finder_flashmatch_GeoAlgo
++        larcorealg::GeoAlgo
++        larcorealg::Geometry
++        larcore::Geometry_Geometry_service
++        lardataalg::DetectorInfo
++        art::Persistency_Provenance
++        art::Utilities
++        canvas::canvas
++        art::Utilities canvas::canvas
++        art::Framework_Core
++        art::Framework_IO_Sources
++        art::Framework_Principal
++        art::Framework_Services_Registry
++        art_root_io::tfile_support ${ROOT_CORE}
++        art_root_io::TFileService_service
+         ${ART_PERSISTENCY_COMMON}
+         ${ART_PERSISTENCY_PROVENANCE}
+         ${ART_UTILITIES}
+         ${MF_MESSAGELOGGER}
+         ${MF_UTILITIES}
+         ${CETLIB}
+-        ${CLHEP}
+-        ${BOOST_LIB}
+-        ${Boost_SYSTEM_LIBRARY}
+-        ${ROOT_BASIC_LIB_LIST}
++        CLHEP::CLHEP
++        Boost::system
++        ${ROOTLIB}
+         ${FHICLCPP}
+-        cetlib cetlib_except
++        cetlib::cetlib cetlib_except::cetlib_except
+ )
+ 
+ install_headers()
+diff --git a/sbncode/OpT0Finder/flashmatch/GeoAlgo/CMakeLists.txt b/sbncode/OpT0Finder/flashmatch/GeoAlgo/CMakeLists.txt
+index a7a8eb7..9c05406 100644
+--- a/sbncode/OpT0Finder/flashmatch/GeoAlgo/CMakeLists.txt
++++ b/sbncode/OpT0Finder/flashmatch/GeoAlgo/CMakeLists.txt
+@@ -1,6 +1,6 @@
+-art_make(
++art_make( ### MIGRATE-ACTION-RECOMMENDED: use art_make_library(), art_dictionary(), simple_plugin() with explicit source lists
+     LIB_LIBRARIES
+-        ${ROOT_BASIC_LIB_LIST}
++        ROOT::Core ROOT::Physics
+ )
+ 
+ install_headers()
+diff --git a/sbncode/PID/CMakeLists.txt b/sbncode/PID/CMakeLists.txt
+index a090c6e..9ab5078 100644
+--- a/sbncode/PID/CMakeLists.txt
++++ b/sbncode/PID/CMakeLists.txt
+@@ -1,41 +1,39 @@
+-#link_directories(
++#link_directories( ### MIGRATE-ACTION-RECOMMENDED: use target_link_libraries() with target semantics
+ # $ENV{ROOTSYS}/lib
+ #)
+ 
+-art_make( MODULE_LIBRARIES
+-  ${ART_FRAMEWORK_CORE}
+-  ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-  ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+-  ${ART_FRAMEWORK_SERVICES_OPTIONAL_TFILESERVICE_SERVICE}
+-  ${ART_ROOT_IO_TFILE_SUPPORT}
+-  ${ART_ROOT_IO_TFILESERVICE_SERVICE}
+-  ${ART_FRAMEWORK_SERVICES}
+-  ${ART_FRAMEWORK_PRINCIPAL}
+-  art_Persistency_Common
+-  art_Utilities canvas
++art_make( MODULE_LIBRARIES ### MIGRATE-ACTION-RECOMMENDED: use art_make_library(), art_dictionary(), simple_plugin() with explicit source lists
++  art::Framework_Core
++  art::Framework_Services_Registry
++  art_root_io::TFileService_service
++  art_root_io::tfile_support
++  art_root_io::TFileService_service
++  art::Framework_Principal
++  art::Persistency_Common
++  art::Utilities canvas::canvas
+   ${MF_MESSAGELOGGER}
+   ${MF_UTILITIES}
+   ${FHICLCPP}
+-  cetlib cetlib_except
++  cetlib::cetlib cetlib_except::cetlib_except
+   ${ROOT_EVE_LIB_LIST}
+   ${ROOT_X3d}
+   ${ROOT_BASIC_LIB_LIST}
+   ${ROOT_GEOM}
+   ROOT::TMVA
+ 
+-  MF_MessageLogger
++  messagefacility::MF_MessageLogger
+ 
+   sbn_LArReco
+-  sbnobj_Common_CRT
+-  sbnobj_Common_Reco
+-  lardataobj_RecoBase_AssnsDicts_dict
+-  lardataobj_RecoBase_dict
+-  lardataobj_RecoBase
+-  larsim_Utils
+-  larsim_Simulation
+-  larsim_MCCheater_BackTrackerService_service
+-  larsim_MCCheater_ParticleInventoryService_service
+-  nusimdata_SimulationBase
++  sbnobj::Common_CRT
++  sbnobj::Common_Reco
++  lardataobj::RecoBase_AssnsDicts_dict
++  lardataobj::RecoBase_dict
++  lardataobj::RecoBase
++  larsim::Utils
++  larsim::Simulation
++  larsim::MCCheater_BackTrackerService_service
++  larsim::MCCheater_ParticleInventoryService_service
++  nusimdata::SimulationBase
+ 
+   caf_RecoUtils
+ )
+diff --git a/sbncode/SBNEventWeight/App/CMakeLists.txt b/sbncode/SBNEventWeight/App/CMakeLists.txt
+index 6d1d2fa..b7ee9ef 100644
+--- a/sbncode/SBNEventWeight/App/CMakeLists.txt
++++ b/sbncode/SBNEventWeight/App/CMakeLists.txt
+@@ -1,22 +1,8 @@
+-art_make(
+-  LIBRARY_NAME sbncode_SBNEventWeight
+-  LIB_LIBRARIES
+-    sbnobj_Common_SBNEventWeight
+-    sbncode_SBNEventWeight_Base
+-    sbncode_SBNEventWeight_Calculators_CrossSection
+-    sbncode_SBNEventWeight_Calculators_BNBFlux
+-    #sbncode_SBNEventWeight_Calculators_Geant4
+-  MODULE_LIBRARIES
+-    sbnobj_Common_SBNEventWeight
+-    sbncode_SBNEventWeight_Base
+-    sbncode_SBNEventWeight_Calculators_CrossSection
+-    sbncode_SBNEventWeight_Calculators_BNBFlux
+-    nusimdata_SimulationBase
+-    ${MF_MESSAGELOGGER}
+-    ${ROOT_GEOM}
+-    ${LXML2}
+-    GSL
+-)
++simple_plugin(SBNEventWeight module
++  sbnobj::Common_SBNEventWeight sbncode::SBNEventWeight_Base
++  sbncode::SBNEventWeight_Calculators_CrossSection
++  sbncode::SBNEventWeight_Calculators_BNBFlux nusimdata::SimulationBase
++  ROOT::Geom)
+ 
+ install_headers()
+ install_fhicl()
+diff --git a/sbncode/SBNEventWeight/Base/CMakeLists.txt b/sbncode/SBNEventWeight/Base/CMakeLists.txt
+index c9d79d2..eece2cd 100644
+--- a/sbncode/SBNEventWeight/Base/CMakeLists.txt
++++ b/sbncode/SBNEventWeight/Base/CMakeLists.txt
+@@ -1,15 +1,15 @@
+-art_make(
+-  LIBRARY_NAME sbncode_SBNEventWeight_Base
++art_make( ### MIGRATE-ACTION-RECOMMENDED: use art_make_library(), art_dictionary(), simple_plugin() with explicit source lists
++  LIBRARY_NAME sbncode::SBNEventWeight_Base
+   LIB_LIBRARIES
+-    sbnobj_Common_SBNEventWeight
+-    ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-    ${ART_FRAMEWORK_SERVICES_OPTIONAL}
++    sbnobj::Common_SBNEventWeight
++    nurandom::RandomUtils_NuRandomService_service
++    art::Framework_Services_Registry
+     ${ART_FRAMEWORK_SERVICES_OPTIONAL_RANDOMNUMBERGENERATOR_SERVICE}
+     ${ART_UTILITIES}
+     ${ROOT_BASIC_LIB_LIST}
+-    ${CLHEP}
+-    canvas
+-    cetlib_except
++    CLHEP::CLHEP
++    canvas::canvas
++    cetlib_except::cetlib_except
+ )
+ 
+ install_headers()
+diff --git a/sbncode/SBNEventWeight/Calculators/BNBFlux/CMakeLists.txt b/sbncode/SBNEventWeight/Calculators/BNBFlux/CMakeLists.txt
+index 56f20ab..66ae865 100644
+--- a/sbncode/SBNEventWeight/Calculators/BNBFlux/CMakeLists.txt
++++ b/sbncode/SBNEventWeight/Calculators/BNBFlux/CMakeLists.txt
+@@ -1,19 +1,20 @@
+-include_directories($ENV{GENIE_INC}/GENIE)
++include_directories($ENV{GENIE}/include/GENIE)
+ 
+ art_make(
+   LIBRARY_NAME sbncode_SBNEventWeight_Calculators_BNBFlux
+   LIB_LIBRARIES
+-    sbncode_SBNEventWeight_Base
+-    nugen_EventGeneratorBase_GENIE
+-    nugen_NuReweight_art
+-    nugen_NuReweight
+-    nurandom_RandomUtils_NuRandomService_service
+-    ${ART_FRAMEWORK_PRINCIPAL}
+-    ${ART_PERSISTENCY_PROVENANCE}
+-    ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-    ${FHICLCPP}
+-    ${CETLIB}
+-    nusimdata_SimulationBase
++    sbncode::SBNEventWeight_Base
++    nugen::EventGeneratorBase_GENIE
++    nugen::NuReweight_art
++    nugen::NuReweight
++    nurandom::RandomUtils_NuRandomService_service
++    art::Framework_Principal
++    art::Persistency_Provenance
++    art::Framework_Services_Registry
++    fhiclcpp::fhiclcpp
++    cetlib::cetlib
++    nusimdata::SimulationBase
++    ROOT::Hist
+ )
+ 
+ install_headers()
+diff --git a/sbncode/SBNEventWeight/Calculators/CrossSections/CMakeLists.txt b/sbncode/SBNEventWeight/Calculators/CrossSections/CMakeLists.txt
+index 354a4cc..a2d29bc 100644
+--- a/sbncode/SBNEventWeight/Calculators/CrossSections/CMakeLists.txt
++++ b/sbncode/SBNEventWeight/Calculators/CrossSections/CMakeLists.txt
+@@ -1,33 +1,17 @@
+-# Headers needed for the GenieWeightCalc class
+-include_directories ( $ENV{GENIE_INC} )
+-include_directories ( $ENV{GENIE_INC}/GENIE )
+-include_directories ( $ENV{LOG4CPP_INC} )
++include_directories($ENV{GENIE}/include/GENIE) ### MIGRATE-ACTION-RECOMMENDED: use target_link_directories() with target semantics
+ 
+-# Builds of MicroBooNE-specific larsim releases should uncomment the
+-# "add_definitions" line below. It enables extra reweighting functionality
+-# which is present only in "MicroBooNE patch" releases of GENIE v3.0.4. These
+-# require building against a special ups product.
+-
+-# Define a macro that indicates whether a GENIE version before 3.0.0 is in use
+- parse_ups_version( ${GENIE_VERSION} )
+- if( ${VMAJ} LESS 3 )
+-   add_definitions(-DGENIE_PRE_R3)
+-   endif()
+-
+-# not applying the following, YET
+-#add_definitions(-DGENIE_UB_PATCH)
+-
+-art_make(
++art_make( ### MIGRATE-ACTION-RECOMMENDED: use art_make_library(), art_dictionary(), simple_plugin() with explicit source lists
+   LIBRARY_NAME sbncode_SBNEventWeight_Calculators_CrossSection
+   LIB_LIBRARIES
+-    sbncode_SBNEventWeight_Base
+-    nugen_EventGeneratorBase_GENIE
+-    nurandom_RandomUtils_NuRandomService_service
+-    ${ART_FRAMEWORK_PRINCIPAL}
++    sbncode::SBNEventWeight_Base
++    nugen::EventGeneratorBase_GENIE
++    nugen::NuReweight_art
++    nugen::NuReweight
++    nurandom::RandomUtils_NuRandomService_service
++    art::Framework_Principal
+     ${ART_PERSISTENCY_PROVENANCE}
+-    ${ART_FRAMEWORK_SERVICES_REGISTRY}
++    art::Framework_Services_Registry
+     ${FHICLCPP}
+-
+    #GENIE_LIB_LIST is explicitly listed below:
+     LOG4CPP
+     GFWMSG
+@@ -81,7 +65,7 @@ art_make(
+ 	GSL
+     #GENIE libraries are above
+     ${MF_MESSAGELOGGER}
+-    cetlib_except
++    cetlib_except::cetlib_except
+ )
+ 
+ install_headers()
+diff --git a/sbncode/TPCReco/CMakeLists.txt b/sbncode/TPCReco/CMakeLists.txt
+index 9c2b25c..8083eff 100644
+--- a/sbncode/TPCReco/CMakeLists.txt
++++ b/sbncode/TPCReco/CMakeLists.txt
+@@ -3,56 +3,58 @@ add_subdirectory(TrackSplit)
+ add_subdirectory(VertexStub)
+ add_subdirectory(CalorimetryAnalysis)
+ 
+-link_directories(
++link_directories( ### MIGRATE-ACTION-RECOMMENDED: use target_link_libraries() with target semantics
+  $ENV{ROOTSYS}/lib
+ )
+ 
+ simple_plugin(NuVertexChargeTree module
+-	${ART_FRAMEWORK_CORE}
+-	${ART_FRAMEWORK_SERVICES_REGISTRY}
+-	${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-	${ART_FRAMEWORK_PRINCIPAL}
+-	art_Persistency_Common
+-	art_Utilities canvas
++	art::Framework_Core
++	art::Framework_Services_Registry
++	art_root_io::TFileService_service
++	art::Framework_Principal
++	art::Persistency_Common
++	art::Utilities canvas::canvas
+ 	${MF_MESSAGELOGGER}
+ 	${MF_UTILITIES}
+ 	${FHICLCPP}
+-	cetlib cetlib_except
++	cetlib::cetlib cetlib_except::cetlib_except
+ 	${ROOT_EVE_LIB_LIST}
+-	${ROOT_X3d}
++	ROOT::X3d
+ 	${ROOT_BASIC_LIB_LIST}
+-	MF_MessageLogger
+-
+-	sbnobj_Common_Reco
+-	lardataobj_AnalysisBase
+-        
+-        art_root_io_tfile_support
+-        art_root_io
+-        art_root_io_dict
++	messagefacility::MF_MessageLogger
++        lardata::DetectorInfoServices_DetectorClocksServiceStandard_service
++	sbnobj::Common_Reco
++	lardataobj::AnalysisBase
++        lardataalg::DetectorInfo        
++        art_root_io::tfile_support
++        art_root_io::art_root_io
++        art_root_io::dict
+         caf_RecoUtils
+-        larsim_MCCheater_BackTrackerService_service
+-        nusimdata_SimulationBase
+-        larcorealg_Geometry
+-        larcore_Geometry_Geometry_service
+-	larpandora_LArPandoraInterface
+-        larsim_MCCheater_ParticleInventoryService_service
++        larsim::MCCheater_BackTrackerService_service
++        nusimdata::SimulationBase
++        larcorealg::Geometry
++        larcore::Geometry_Geometry_service
++	larpandora::LArPandoraInterface
++        larsim::MCCheater_ParticleInventoryService_service
+ 	sbn_LArReco	    
+-	sbncode_TPCReco_VertexStub
++	sbncode::TPCReco_VertexStub
+ )
++
++link_directories( $ENV{IFDHC_DIR}/lib )
++
+ simple_plugin ( EventSelect module
+-                IFDH_SERVICE
+-               ${ART_FRAMEWORK_CORE}
+-               ${ART_FRAMEWORK_PRINCIPAL}
+-               ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-               ${ART_FRAMEWORK_SERVICES_BASIC}
+-               ${ART_FRAMEWORK_SERVICES_OPTIONAL}
+-               art_Utilities canvas
++               ifdh_art::IFDH_service
++               art::Framework_Core
++               art::Framework_Principal
++               art::Framework_Services_Registry
++               art::Utilities canvas::canvas
+                ${MF_MESSAGELOGGER}
+                ${MF_UTILITIES}
+                ${FHICLCPP}
+-               cetlib cetlib_except
++               cetlib::cetlib cetlib_except::cetlib_except
++               lardataalg::DetectorInfo        
+ 	${ROOT_EVE_LIB_LIST}
+-	${ROOT_X3d}
++	ROOT::X3d
+ 	${ROOT_BASIC_LIB_LIST}
+ )
+ 
+diff --git a/sbncode/TPCReco/CalorimetryAnalysis/CMakeLists.txt b/sbncode/TPCReco/CalorimetryAnalysis/CMakeLists.txt
+index cae53c3..3d184e7 100644
+--- a/sbncode/TPCReco/CalorimetryAnalysis/CMakeLists.txt
++++ b/sbncode/TPCReco/CalorimetryAnalysis/CMakeLists.txt
+@@ -1,33 +1,35 @@
+ simple_plugin( CalorimetryAnalysis module
+-                            ${ART_FRAMEWORK_CORE}
+-                            ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-                            ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-                            ${ART_FRAMEWORK_PRINCIPAL}
+-                            art_Persistency_Common
+-                            art_Utilities canvas
++                            art::Framework_Core
++                            art::Framework_Services_Registry
++                            art_root_io::TFileService_service
++                            art::Framework_Principal
++                            art::Persistency_Common
++                            art::Utilities canvas::canvas
+                             ${MF_MESSAGELOGGER}
+                             ${MF_UTILITIES}
+                             ${FHICLCPP}
+-                            cetlib cetlib_except
+-                            ${ROOT_EVE_LIB_LIST}
+-                            ${ROOT_X3d}
+-                            ${ROOT_BASIC_LIB_LIST}
+-	art_root_io_tfile_support
+-	art_root_io
+-	art_root_io_dict
++                            cetlib::cetlib cetlib_except::cetlib_except
++                            ROOT::EG
++                            ROOT::X3d
++                            ROOT::Core
++	art_root_io::tfile_support
++	art_root_io::art_root_io
++	art_root_io::dict
+         caf_RecoUtils
+-        lardataobj_AnalysisBase
+-        lardataobj_RecoBase
+-        larcorealg_Geometry
+-        larcore_Geometry_Geometry_service
+-        larcorealg_GeoAlgo
+-        larsim_MCCheater_BackTrackerService_service
+-        nusimdata_SimulationBase
+-        larsim_MCCheater_ParticleInventoryService_service
+-	sbnobj_Common_Reco
+-	larcorealg_GeoAlgo
+-	lardata_DetectorInfoServices_DetectorPropertiesServiceStandard_service
+-	lardataalg_DetectorInfo
++        larreco::RecoAlg
++        lardataobj::AnalysisBase
++        lardataobj::RecoBase
++        larcorealg::Geometry
++        larcore::Geometry_Geometry_service
++        larcorealg::GeoAlgo
++        larsim::MCCheater_BackTrackerService_service
++        nusimdata::SimulationBase
++        larsim::MCCheater_ParticleInventoryService_service
++	sbnobj::Common_Reco
++	larcorealg::GeoAlgo
++	lardata::DetectorInfoServices_DetectorPropertiesServiceStandard_service
++	lardataalg::DetectorInfo
++        larevt::SpaceCharge
+ )
+ 
+ 
+diff --git a/sbncode/TPCReco/KinkExp/CMakeLists.txt b/sbncode/TPCReco/KinkExp/CMakeLists.txt
+index 17e04b1..d61df1d 100644
+--- a/sbncode/TPCReco/KinkExp/CMakeLists.txt
++++ b/sbncode/TPCReco/KinkExp/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-link_directories(
++link_directories( ### MIGRATE-ACTION-RECOMMENDED: use target_link_libraries() with target semantics
+  $ENV{ROOTSYS}/lib
+ )
+ 
+@@ -6,85 +6,85 @@ art_make_library(
+ 	LIBRARY_NAME sbn_LArReco_PCA
+ 	SOURCE PCA.cc
+ 	LIBRARIES
+-	sbnobj_Common_Reco
+-	lardataobj_RecoBase_AssnsDicts_dict
+-	lardataobj_RecoBase_dict	
++	sbnobj::Common_Reco
++	lardataobj::RecoBase_AssnsDicts_dict
++	lardataobj::RecoBase_dict	
+ 	sbndcode_OpDetSim
+ )
+ 
+ simple_plugin(PCAnglePlaneMaker module
+-	${ART_FRAMEWORK_CORE}
+-	${ART_FRAMEWORK_SERVICES_REGISTRY}
+-	${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-	${ART_FRAMEWORK_PRINCIPAL}
+-	art_Persistency_Common
+-	art_Utilities canvas
++	art::Framework_Core
++	art::Framework_Services_Registry
++	art_root_io::TFileService_service
++	art::Framework_Principal
++	art::Persistency_Common
++	art::Utilities canvas::canvas
+ 	${MF_MESSAGELOGGER}
+ 	${MF_UTILITIES}
+ 	${FHICLCPP}
+-	cetlib cetlib_except
++	cetlib::cetlib cetlib_except::cetlib_except
+ 	${ROOT_EVE_LIB_LIST}
+ 	${ROOT_X3d}
+ 	${ROOT_BASIC_LIB_LIST}
+-	MF_MessageLogger
++	messagefacility::MF_MessageLogger
+ 
+-	sbnobj_Common_Reco
+-	lardataobj_AnalysisBase
+-        larcorealg_Geometry
+-        larcore_Geometry_Geometry_service
++	sbnobj::Common_Reco
++	lardataobj::AnalysisBase
++        larcorealg::Geometry
++        larcore::Geometry_Geometry_service
+ 	sbn_LArReco_PCA
+ )
+ 
+ simple_plugin(PCAngleKinkFinder module
+-	${ART_FRAMEWORK_CORE}
+-	${ART_FRAMEWORK_SERVICES_REGISTRY}
+-	${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-	${ART_FRAMEWORK_PRINCIPAL}
+-	art_Persistency_Common
+-	art_Utilities canvas
++	art::Framework_Core
++	art::Framework_Services_Registry
++	art_root_io::TFileService_service
++	art::Framework_Principal
++	art::Persistency_Common
++	art::Utilities canvas::canvas
+ 	${MF_MESSAGELOGGER}
+ 	${MF_UTILITIES}
+ 	${FHICLCPP}
+-	cetlib cetlib_except
++	cetlib::cetlib cetlib_except::cetlib_except
+ 	${ROOT_EVE_LIB_LIST}
+ 	${ROOT_X3d}
+ 	${ROOT_BASIC_LIB_LIST}
+-	MF_MessageLogger
++	messagefacility::MF_MessageLogger
+ 	Minuit
+ 
+-	sbnobj_Common_Reco
+-	lardataobj_AnalysisBase
+-        larcorealg_Geometry
+-        larcore_Geometry_Geometry_service
++	sbnobj::Common_Reco
++	lardataobj::AnalysisBase
++        larcorealg::Geometry
++        larcore::Geometry_Geometry_service
+ )
+ 
+ simple_plugin(PCAngleKinkTree module
+-	${ART_FRAMEWORK_CORE}
+-	${ART_FRAMEWORK_SERVICES_REGISTRY}
+-	${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-	${ART_FRAMEWORK_PRINCIPAL}
+-	art_Persistency_Common
+-	art_Utilities canvas
++	art::Framework_Core
++	art::Framework_Services_Registry
++	art_root_io::TFileService_service
++	art::Framework_Principal
++	art::Persistency_Common
++	art::Utilities canvas::canvas
+ 	${MF_MESSAGELOGGER}
+ 	${MF_UTILITIES}
+ 	${FHICLCPP}
+-	cetlib cetlib_except
++	cetlib::cetlib cetlib_except::cetlib_except
+ 	${ROOT_EVE_LIB_LIST}
+ 	${ROOT_X3d}
+ 	${ROOT_BASIC_LIB_LIST}
+-	MF_MessageLogger
++	messagefacility::MF_MessageLogger
+ 
+-	sbnobj_Common_Reco
+-	lardataobj_AnalysisBase
++	sbnobj::Common_Reco
++	lardataobj::AnalysisBase
+         
+-        art_root_io_tfile_support
+-        art_root_io
+-        art_root_io_dict
++        art_root_io::tfile_support
++        art_root_io::art_root_io
++        art_root_io::dict
+         caf_RecoUtils
+-        larsim_MCCheater_BackTrackerService_service
+-        nusimdata_SimulationBase
+-        larcorealg_Geometry
+-        larcore_Geometry_Geometry_service
++        larsim::MCCheater_BackTrackerService_service
++        nusimdata::SimulationBase
++        larcorealg::Geometry
++        larcore::Geometry_Geometry_service
+ 	sbn_LArReco_PCA
+ )
+ 
+diff --git a/sbncode/TPCReco/TrackHit/CMakeLists.txt b/sbncode/TPCReco/TrackHit/CMakeLists.txt
+index 7ee08b2..af538c3 100644
+--- a/sbncode/TPCReco/TrackHit/CMakeLists.txt
++++ b/sbncode/TPCReco/TrackHit/CMakeLists.txt
+@@ -1,73 +1,77 @@
+ simple_plugin(TrackAreaHit module
+-        ${ART_FRAMEWORK_CORE}
+-        ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-        ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-        ${ART_FRAMEWORK_PRINCIPAL}
+-        art_Persistency_Common
+-        art_Utilities canvas
++        art::Framework_Core
++        art::Framework_Services_Registry
++        art_root_io::TFileService_service
++        art::Framework_Principal
++        art::Persistency_Common
++        art::Utilities canvas::canvas
+         ${MF_MESSAGELOGGER}
+         ${MF_UTILITIES}
+         ${FHICLCPP}
+-        cetlib cetlib_except
++        cetlib::cetlib cetlib_except::cetlib_except
+         ${ROOT_EVE_LIB_LIST}
+         ${ROOT_X3d}
+         ${ROOT_BASIC_LIB_LIST}
+-        MF_MessageLogger
+-        lardataobj_RecoBase_AssnsDicts_dict
+-        lardataobj_RecoBase     
+-        lardataobj_RecoBase_dict        
+-
+-        larcorealg_Geometry
+-        larcore_Geometry_Geometry_service
+-	lardata_DetectorInfoServices_DetectorClocksServiceStandard_service
+-	lardata_DetectorInfoServices_DetectorPropertiesServiceStandard_service
+-	lardataalg_DetectorInfo
++        messagefacility::MF_MessageLogger
++        lardataobj::RecoBase_AssnsDicts_dict
++        lardataobj::RecoBase     
++        lardataobj::RecoBase_dict        
++        larcorealg::Geometry
++        larcore::Geometry_Geometry_service
++	lardata::DetectorInfoServices_DetectorClocksServiceStandard_service
++	lardata::DetectorInfoServices_DetectorPropertiesServiceStandard_service
++	lardataalg::DetectorInfo
++        larsim::Simulation
+ )
+ 
+ simple_plugin(TrackHitFilter module
+-        ${ART_FRAMEWORK_CORE}
+-        ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-        ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-        ${ART_FRAMEWORK_PRINCIPAL}
+-        art_Persistency_Common
+-        art_Utilities canvas
++        art::Framework_Core
++        art::Framework_Services_Registry
++        art_root_io::TFileService_service
++        art::Framework_Principal
++        art::Persistency_Common
++        art::Utilities canvas::canvas
+         ${MF_MESSAGELOGGER}
+         ${MF_UTILITIES}
+         ${FHICLCPP}
+-        cetlib cetlib_except
++        cetlib::cetlib cetlib_except::cetlib_except
+         ${ROOT_EVE_LIB_LIST}
+         ${ROOT_X3d}
+         ${ROOT_BASIC_LIB_LIST}
+-        MF_MessageLogger
+-        lardataobj_RecoBase_AssnsDicts_dict
+-        lardataobj_RecoBase     
+-        lardataobj_RecoBase_dict        
++        messagefacility::MF_MessageLogger
++        lardataobj::RecoBase_AssnsDicts_dict
++        lardataobj::RecoBase     
++        lardataobj::RecoBase_dict        
++	lardataalg::DetectorInfo
++	lardata::DetectorInfoServices_DetectorPropertiesServiceStandard_service
+ 
+-        larcorealg_Geometry
+-        larcore_Geometry_Geometry_service
++        larcorealg::Geometry
++        larcore::Geometry_Geometry_service
+ )
+ 
+ simple_plugin(TrackHitDumper module
+-	${ART_FRAMEWORK_CORE}
+-	${ART_FRAMEWORK_SERVICES_REGISTRY}
+-	${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-	${ART_FRAMEWORK_PRINCIPAL}
+-	art_Persistency_Common
+-	art_Utilities canvas
++	art::Framework_Core
++	art::Framework_Services_Registry
++	art_root_io::TFileService_service
++	art::Framework_Principal
++	art::Persistency_Common
++	art::Utilities canvas::canvas
+ 	${MF_MESSAGELOGGER}
+ 	${MF_UTILITIES}
+ 	${FHICLCPP}
+-	cetlib cetlib_except
++	cetlib::cetlib cetlib_except::cetlib_except
+ 	${ROOT_EVE_LIB_LIST}
+ 	${ROOT_X3d}
+ 	${ROOT_BASIC_LIB_LIST}
+-	MF_MessageLogger
+-	lardataobj_RecoBase_AssnsDicts_dict
+-	lardataobj_RecoBase	
+-	lardataobj_RecoBase_dict	
++	messagefacility::MF_MessageLogger
++	lardataobj::RecoBase_AssnsDicts_dict
++	lardataobj::RecoBase	
++	lardataobj::RecoBase_dict	
++	lardataalg::DetectorInfo
++	lardata::DetectorInfoServices_DetectorPropertiesServiceStandard_service
+ 
+-	larcorealg_Geometry
+-	larcore_Geometry_Geometry_service
++	larcorealg::Geometry
++	larcore::Geometry_Geometry_service
+ )
+ 
+ install_headers()
+diff --git a/sbncode/TPCReco/TrackSplit/CMakeLists.txt b/sbncode/TPCReco/TrackSplit/CMakeLists.txt
+index 7e92476..4470cfd 100644
+--- a/sbncode/TPCReco/TrackSplit/CMakeLists.txt
++++ b/sbncode/TPCReco/TrackSplit/CMakeLists.txt
+@@ -1,49 +1,49 @@
+ simple_plugin(TrackSplitter module
+-  ${ART_FRAMEWORK_CORE}
+-  ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-  ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-  ${ART_FRAMEWORK_PRINCIPAL}
+-  art_Persistency_Common
+-  art_Utilities canvas
++  art::Framework_Core
++  art::Framework_Services_Registry
++  art_root_io::TFileService_service
++  art::Framework_Principal
++  art::Persistency_Common
++  art::Utilities canvas::canvas
+   ${MF_MESSAGELOGGER}
+   ${MF_UTILITIES}
+   ${FHICLCPP}
+-  cetlib cetlib_except
++  cetlib::cetlib cetlib_except::cetlib_except
+   ${ROOT_EVE_LIB_LIST}
+   ${ROOT_X3d}
+   ${ROOT_BASIC_LIB_LIST}
+-  MF_MessageLogger
+-  larcorealg_Geometry
+-  larcore_Geometry_Geometry_service
+-  lardata_DetectorInfoServices_DetectorClocksServiceStandard_service
+-  lardata_DetectorInfoServices_DetectorPropertiesServiceStandard_service
+-  lardataalg_DetectorInfo
++  messagefacility::MF_MessageLogger
++  larcorealg::Geometry
++  larcore::Geometry_Geometry_service
++  lardata::DetectorInfoServices_DetectorClocksServiceStandard_service
++  lardata::DetectorInfoServices_DetectorPropertiesServiceStandard_service
++  lardataalg::DetectorInfo
+ 
+   sbn_LArReco
+-  sbnobj_Common_Reco
++  sbnobj::Common_Reco
+ )
+ 
+ simple_plugin(MergedTrackIdentifier module
+-  ${ART_FRAMEWORK_CORE}
+-  ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-  ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-  ${ART_FRAMEWORK_PRINCIPAL}
+-  art_Persistency_Common
+-  art_Utilities canvas
++  art::Framework_Core
++  art::Framework_Services_Registry
++  art_root_io::TFileService_service
++  art::Framework_Principal
++  art::Persistency_Common
++  art::Utilities canvas::canvas
+   ${MF_MESSAGELOGGER}
+   ${MF_UTILITIES}
+   ${FHICLCPP}
+-  cetlib cetlib_except
++  cetlib::cetlib cetlib_except::cetlib_except
+   ${ROOT_EVE_LIB_LIST}
+   ${ROOT_X3d}
+   ${ROOT_BASIC_LIB_LIST}
+-  MF_MessageLogger
+-  larcorealg_Geometry
+-  larcore_Geometry_Geometry_service
+-  larpandora_LArPandoraInterface
++  messagefacility::MF_MessageLogger
++  larcorealg::Geometry
++  larcore::Geometry_Geometry_service
++  larpandora::LArPandoraInterface
+ 
+   sbn_LArReco
+-  sbnobj_Common_Reco
++  sbnobj::Common_Reco
+ )
+ 
+ install_headers()
+diff --git a/sbncode/TPCReco/VertexStub/CMakeLists.txt b/sbncode/TPCReco/VertexStub/CMakeLists.txt
+index 66c0848..837bdc3 100644
+--- a/sbncode/TPCReco/VertexStub/CMakeLists.txt
++++ b/sbncode/TPCReco/VertexStub/CMakeLists.txt
+@@ -1,121 +1,125 @@
+ art_make_library(
+         SOURCE StubBuilder.cxx StubMergeAlgorithms.cxx
+         LIBRARIES
+-	${ART_FRAMEWORK_CORE}
+-	${ART_FRAMEWORK_PRINCIPAL}
+-	art_Persistency_Common
+-	art_Persistency_Provenance
+-	canvas art_Utilities
++	art::Framework_Core
++	art::Framework_Principal
++	art::Persistency_Common
++	art::Persistency_Provenance
++	canvas::canvas art::Utilities
+ 	${FHICLCPP}
+-	cetlib cetlib_except
++	cetlib::cetlib cetlib_except::cetlib_except
+ 	${ROOT_BASIC_LIB_LIST}
+-	MF_MessageLogger
+-
+-	sbnobj_Common_Reco
+-	lardataobj_AnalysisBase
+-        larcorealg_Geometry
+-	larreco_Calorimetry
+-	lardataobj_RecoBase
+-	lardataalg_DetectorInfo
++	messagefacility::MF_MessageLogger
++lardata::DetectorInfoServices_DetectorPropertiesServiceStandard_service
++	sbnobj::Common_Reco
++	lardataobj::AnalysisBase
++        larcorealg::Geometry
++	larreco::Calorimetry
++	lardataobj::RecoBase
++	lardataalg::DetectorInfo
++        larevt::SpaceCharge
+ )
+ simple_plugin(VertexChargeVacuum module
+-	${ART_FRAMEWORK_CORE}
+-	${ART_FRAMEWORK_PRINCIPAL}
+-	${ART_FRAMEWORK_SERVICES}
+-	${ART_FRAMEWORK_SERVICES_REGISTRY}
+-	art_Persistency_Common
+-	art_Utilities canvas
++	art::Framework_Core
++	art::Framework_Principal
++	art::Framework_Services_Registry
++	art::Persistency_Common
++	art::Utilities canvas::canvas
+ 	${FHICLCPP}
+-	cetlib cetlib_except
++	cetlib::cetlib cetlib_except::cetlib_except
+ 	${ROOT_EVE_LIB_LIST}
+ 	${ROOT_X3d}
+ 	${ROOT_BASIC_LIB_LIST}
+-	MF_MessageLogger
+-
+-	sbnobj_Common_Reco
+-	lardataobj_AnalysisBase
+-        larcorealg_Geometry
+-	larreco_Calorimetry
+-	lardataobj_RecoBase
+-	lardataalg_DetectorInfo
+-	sbncode_TPCReco_VertexStub
++	messagefacility::MF_MessageLogger
++lardata::DetectorInfoServices_DetectorPropertiesServiceStandard_service
++	sbnobj::Common_Reco
++	lardataobj::AnalysisBase
++        larcorealg::Geometry
++	larreco::Calorimetry
++	lardataobj::RecoBase
++	lardataalg::DetectorInfo
++	sbncode::TPCReco_VertexStub
++        larevt::SpaceCharge
+ )
+ 
+ simple_plugin(VertexStubTracker module
+-	${ART_FRAMEWORK_CORE}
+-	${ART_FRAMEWORK_SERVICES_REGISTRY}
+-	${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-	${ART_FRAMEWORK_PRINCIPAL}
+-	art_Persistency_Common
+-	art_Persistency_Provenance
+-	art_Utilities canvas
++	art::Framework_Core
++	art::Framework_Services_Registry
++	art_root_io::TFileService_service
++	art::Framework_Principal
++	art::Persistency_Common
++	art::Persistency_Provenance
++	art::Utilities canvas::canvas
+ 	${MF_MESSAGELOGGER}
+ 	${MF_UTILITIES}
+ 	${FHICLCPP}
+-	cetlib cetlib_except
++	cetlib::cetlib cetlib_except::cetlib_except
+ 	${ROOT_EVE_LIB_LIST}
+ 	${ROOT_X3d}
+ 	${ROOT_BASIC_LIB_LIST}
+-	MF_MessageLogger
+-
+-	sbnobj_Common_Reco
+-	lardataobj_AnalysisBase
+-        larcorealg_Geometry
+-        larcore_Geometry_Geometry_service
+-	larreco_Calorimetry
+-	lardataalg_DetectorInfo
+-	sbncode_TPCReco_VertexStub
++	messagefacility::MF_MessageLogger
++lardata::DetectorInfoServices_DetectorPropertiesServiceStandard_service
++	sbnobj::Common_Reco
++	lardataobj::AnalysisBase
++        larcorealg::Geometry
++        larcore::Geometry_Geometry_service
++	larreco::Calorimetry
++	lardataalg::DetectorInfo
++	sbncode::TPCReco_VertexStub
++        larevt::SpaceCharge
+ )
+ 
+ simple_plugin(PlaneStubMerge tool
+-        ${ART_FRAMEWORK_CORE}
+-        ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-        ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-        ${ART_FRAMEWORK_PRINCIPAL}
+-        art_Persistency_Common
+-	art_Persistency_Provenance
+-        art_Utilities canvas
++        art::Framework_Core
++        art::Framework_Services_Registry
++        art_root_io::TFileService_service
++        art::Framework_Principal
++        art::Persistency_Common
++	art::Persistency_Provenance
++        art::Utilities canvas::canvas
+         ${MF_MESSAGELOGGER}
+         ${MF_UTILITIES}
+         ${FHICLCPP}
+-        cetlib cetlib_except
++        cetlib::cetlib cetlib_except::cetlib_except
+         ${ROOT_EVE_LIB_LIST}
+         ${ROOT_X3d}
+         ${ROOT_BASIC_LIB_LIST}
+-        MF_MessageLogger
+-
+-	sbnobj_Common_Reco
+-	lardataobj_AnalysisBase
+-        larcorealg_Geometry
+-        larcore_Geometry_Geometry_service
+-	larreco_Calorimetry
+-	lardataalg_DetectorInfo
+-	sbncode_TPCReco_VertexStub
++        messagefacility::MF_MessageLogger
++lardata::DetectorInfoServices_DetectorPropertiesServiceStandard_service
++	sbnobj::Common_Reco
++	lardataobj::AnalysisBase
++        larcorealg::Geometry
++        larcore::Geometry_Geometry_service
++	larreco::Calorimetry
++	lardataalg::DetectorInfo
++	sbncode::TPCReco_VertexStub
++        larevt::SpaceCharge
+ )
+ 
+ simple_plugin(TwoPlaneStubMerge tool
+-        ${ART_FRAMEWORK_CORE}
+-        ${ART_FRAMEWORK_SERVICES_REGISTRY}
+-        ${ART_ROOT_IO_TFILESERVICE_SERVICE}                ${ART_FRAMEWORK_SERVICES}
+-        ${ART_FRAMEWORK_PRINCIPAL}
+-        art_Persistency_Common
+-        art_Utilities canvas
++        art::Framework_Core
++        art::Framework_Services_Registry
++        art_root_io::TFileService_service
++        art::Framework_Principal
++        art::Persistency_Common
++        art::Utilities canvas::canvas
+         ${MF_MESSAGELOGGER}
+         ${MF_UTILITIES}
+         ${FHICLCPP}
+-        cetlib cetlib_except
++        cetlib::cetlib cetlib_except::cetlib_except
+         ${ROOT_EVE_LIB_LIST}
+         ${ROOT_X3d}
+         ${ROOT_BASIC_LIB_LIST}
+-        MF_MessageLogger
+-
+-	sbnobj_Common_Reco
+-	lardataobj_AnalysisBase
+-        larcorealg_Geometry
+-        larcore_Geometry_Geometry_service
+-	larreco_Calorimetry
+-	lardataalg_DetectorInfo
+-	sbncode_TPCReco_VertexStub
++        messagefacility::MF_MessageLogger
++lardata::DetectorInfoServices_DetectorPropertiesServiceStandard_service
++	sbnobj::Common_Reco
++	lardataobj::AnalysisBase
++        larcorealg::Geometry
++        larcore::Geometry_Geometry_service
++	larreco::Calorimetry
++	lardataalg::DetectorInfo
++	sbncode::TPCReco_VertexStub
++        larevt::SpaceCharge
+ )
+ 
+ add_subdirectory(config)
