@@ -35,6 +35,7 @@ class Icaruscode(CMakePackage):
     git_base = 'https://github.com/SBNSoftware/icaruscode.git'
 
     version('develop', commit='84314472f1e206b351fd9b52f1f6800c2a90b4c3', git=git_base, get_full_repo=True)
+    version('09.37.02.04', tag='v09_37_02_04', git=git_base, get_full_repo=True )
     version('09.37.02.03', sha256='1762e5a05ebac100032b2bc46244a63f3bc454f51a583da03b935a6827d7df6f')
     version('09.37.01.03p02', tag='v09_37_01_03p02', git=git_base, get_full_repo=True)
     version('09.37.01.vec03p02', tag='v09_37_01_03p02', git=git_base, get_full_repo=True)
@@ -55,6 +56,7 @@ class Icaruscode(CMakePackage):
     patch('v09_37_01_02p02_larvecutils.patch', when='@09.37.01.vec02p02')
     patch('v09_37_01_03p02_larvecutils.patch', when='@09.37.01.vec03p02')
     patch('v09_37_02_03.patch', when='@09.37.02.03')
+    patch('v09_37_02_04.patch', when='@09.37.02.04')
 
     variant('cxxstd',
             default='17',
