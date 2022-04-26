@@ -26,6 +26,7 @@ class Larreco(CMakePackage):
     url      = "https://github.com/LArSoft/larreco/archive/v01_02_03.tar.gz"
     list_url = "https://api.github.com/repos/LArSoft/larreco/tags"
 
+    version('09.07.08.vecmt02',  branch='larvecutils-v09_07_08_02', git='https://github.com/cerati/larreco.git')
     version('09.07.08.02', sha256='eba7aba2443f4c9efdb0f071db9ca6ffb7f6e0630283f235759c51586e33c449')
     version('09.07.08.vec01',  branch='larvecutils-v09_37_01_01', git='https://github.com/cerati/larreco.git')
     version('09.30.00.rc1', sha256='3c3c52247075dd8f9c002517168159d7ac2c7319ca246d729a677a91d39149d8')
@@ -58,6 +59,7 @@ class Larreco(CMakePackage):
     patch('v09_07_08_01_larvecutils.patch', when='@09.07.08.vec01')
     #patch('v09_07_08_01.patch', when='@09.07.08.01')
     patch('v09_07_08_02.patch', when='@09.07.08.02')
+    patch('v09_07_08_vecmt02.patch', when='@09.07.08.vecmt02')
 
     variant('cxxstd',
             default='17',
@@ -80,6 +82,7 @@ class Larreco(CMakePackage):
     depends_on('nutools')
     depends_on('eigen')
     depends_on('larvecutils', when='@09.07.08.vec01')
+    depends_on('larvecutils', when='@09.07.08.vecmt02')
     depends_on('py-tensorflow', when='+tf')
     depends_on('cetmodules', type='build')
 
